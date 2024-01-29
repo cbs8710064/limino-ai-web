@@ -1,0 +1,343 @@
+<script setup lang='ts'>
+import { useCreateStore } from '@/stores/useCreateStore';
+import { ref, type Ref, nextTick, reactive, computed, onMounted, onUnmounted } from 'vue';
+import TheTelescoping from '@/components/TheTelescoping.vue';
+import FileSaver from 'file-saver'
+import TheButton from '@/components/TheButton.vue';
+import { useI18n } from 'vue-i18n';
+import StoryList from '@/views/workbench/components/StoryList.vue'
+import { useStoryListStore } from '../../stores/useStoryListStore';
+import TheNoData from '@/components/TheNoData.vue';
+import { Image, message } from 'ant-design-vue'
+import { useRequest } from '../../api/useRequest';
+import { videoPath } from '../../const/index';
+const { setMainVideo } = useRequest()
+
+const currentLoading = ref(false)
+const { t } = useI18n()
+type VideoItem = {
+    [x: string]: any;
+    id: number,
+    label: string,
+    url: string,
+    selected: boolean
+}
+const createStore = useCreateStore()
+const storyListStore = useStoryListStore()
+
+const currentVideo: any = ref({ url: '' })
+const currentUrl: Ref<string> = ref('')
+
+const handleDownload = () => {
+    FileSaver.saveAs(videoPath + '/' + currentVideo.value.url, `${new Date().getTime()}.mp4`);
+}
+
+const handleSelect = (e: VideoItem, i: number) => {
+    if (e.selected) {
+        return
+    }
+    currentLoading.value = true
+    nextTick(() => {
+        currentVideo.value = { ...e }
+        currentUrl.value = e.url
+
+        videoList.list.forEach((item, index) => {
+            if (index === i) {
+                item.selected = true
+            } else {
+                item.selected = false
+            }
+        })
+        currentLoading.value = false
+    })
+}
+const videoList: { list: Array<VideoItem> } = reactive({ list: [] })
+const fenJingList: { list: any } = reactive({ list: {} })
+const getVideoList = () => {
+    currentLoading.value = true
+    const vlist: any = []
+    videoList.list = []
+    return new Promise((resolve) => {
+        if (storyListStore.selectedStory?.description?.chat_process) {
+            storyListStore.selectedStory?.description.chat_process.forEach((item, idx) => {
+                if (item.videos && item.videos.length) {
+                    // 处理同一剧情下面所有的视频集合
+                    const vBigList = JSON.parse(JSON.stringify(item.videos)).map((item: any, idx: number) => ({ ...item, selected: false, idx }))
+                    vBigList[0].selected = true
+                    const arr = vBigList.filter((child: any) => (child.status === 3 || !child.status)).map((c: any) => {
+                        return { ...c, isMainVideo: c.url === item.main_video, main_video: item.main_video }
+                    }).sort((a: any, b: any) => b.isMainVideo - a.isMainVideo)
+                    // idx 关联, 处理分镜列表
+                    fenJingList.list[idx] = arr
+                    const total = item.videos.filter((v: any) => v.status === 3).length
+                    const { main_video } = item
+                    item.videos.forEach((video: VideoItem, idx: number) => {
+                        const videoChild = { ...video }
+                        if (idx === 0) {
+                            vlist.push({ ...videoChild, totalVideos: total, idx, main_video, isMainVideo: video.url === item.main_video })
+                        }
+                    })
+                }
+            })
+            if (vlist.length) {
+                const idx = videoIndex.value > -1 ? videoIndex.value : 0
+                vlist[idx].selected = true
+                currentLoading.value = true
+                nextTick(() => {
+                    const mainv = vlist[idx]
+                    if (mainv) {
+                        currentVideo.value = { ...mainv }
+                        currentUrl.value = mainv.url
+                        currentLoading.value = false
+                        videoList.list = vlist
+                        resolve(true)
+                    }
+
+                })
+            }
+        } else {
+            resolve(true)
+            nextTick(() => {
+                currentLoading.value = false
+            })
+        }
+    })
+
+}
+
+const videoIndex = computed(() => {
+    return videoList.list.findIndex(item => item.selected)
+})
+onMounted(async () => {
+    createStore.setStep(5)
+    await storyListStore.getStoryList()
+    getVideoList()
+
+})
+onUnmounted(() => {
+    videoList.list = []
+    currentVideo.value = {
+        url: ''
+    }
+    currentUrl.value = ''
+})
+
+const handleChangeStory = () => {
+    currentVideo.value = {
+        url: ''
+    }
+    getVideoList()
+}
+
+
+const handleChangeShot = (e: any) => {
+    if (e.selected) {
+        return
+    }
+    currentLoading.value = true
+    nextTick(() => {
+        fenJingList.list[videoIndex.value].forEach((item: any) => {
+            if (item.idx === e.idx) {
+                item.selected = true
+                currentVideo.value = e
+            } else {
+                item.selected = false
+            }
+        })
+        currentLoading.value = false
+    })
+}
+
+const mainLoading = ref(false)
+const handleSetMainVideo = async () => {
+    try {
+        mainLoading.value = true
+        const { url, chatIdx } = currentVideo.value
+        const { id } = storyListStore.getSelectedIdAndIdx()
+        if (id) {
+            const res = await setMainVideo(id, chatIdx, url)
+            if (res.error) {
+                message.error(t('errorMessage.setMainVideoFailed'))
+            } else {
+                message.success(t('successMessage.setMainVideoSuccess'))
+                getVideoList()
+            }
+        }
+    } finally {
+        mainLoading.value = false
+    }
+}
+
+const smallVideoList = computed(() => {
+    if (fenJingList.list && fenJingList.list[videoIndex.value]) {
+        return fenJingList.list[videoIndex.value]
+    }
+    return []
+})
+
+
+
+</script>
+<template>
+    <div class="post-page flex-col lg:flex lg:flex-row">
+        <TheTelescoping width="380px" direction="right" class="left-box">
+            <div class="w-100% lg:flex">
+                <StoryList @change="handleChangeStory" />
+                <div class="scrollbar-small-x right-video-list lg:scrollbar-small-y w-100%" v-if="videoList.list && videoList.list.length">
+                    <div class="flex lg:block">
+                        <div :class="`right-video-card cursor-pointer relative ${item.selected ? 'active' : ''}`" v-for="(item, idx) in videoList.list" :key="item.id" @click.stop="handleSelect(item, idx)">
+                            <div class="w-88% overflow-hidden text-ellipsis whitespace-nowrap text-left font-size-4 font-bold w-34">Page{{ idx + 1 }}</div>
+                            <div v-if="item.totalVideos > 1" class="absolute top-0 z-1000 rounded-full color-white right-0">
+                                <div class="flex items-center justify-center">
+                                    <i class="i-fluent-multiselect-rtl-20-filled font-size-5 color-#9f54ba"></i>
+                                </div>
+                            </div>
+                            <Image loading="lazy" v-if="item.status === 3 || !item.status" class="z-140 h-auto w-[100%] object-cover rounded-1" :preview="false" :src="`${videoPath}/${item.cover}`"></Image>
+                            <!-- <img v-if="item.status === 3 || !item.status" class="z-140 h-auto w-[100%] object-cover rounded-1" :src="`${videoPath}/${item.cover}`" alt=""> -->
+                            <div class="flex items-center justify-center pb-2 h-26" v-else>
+                                <div v-if="item.status === 1 || item.status === 2">
+                                    <div class="text-center"><i class="i-svg-spinners-ring-resize font-size-8"></i></div>
+                                    <div class="text-center">{{ t('workbench.views.creating') }}</div>
+                                </div>
+                                <div v-else class="flex items-center justify-center color-#ccc">
+                                    {{ t('errorMessage.createFailed') }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-else class="h-100% w-100% p-4 text-center font-size-4 color-#ccc lg:text-left">
+                    {{ t('home.noContent') }}
+                </div>
+            </div>
+
+        </TheTelescoping>
+
+        <div class="scrollbar-small-y con w-100% lg:h-93.3vh">
+            <div class="min-h-55vh w-100% flex items-start justify-center py-4 lg:mt-10 lg:min-h-140 lg:items-center lg:py-10">
+                <div class="relative mx-4 mt-10 max-w-220 w-100% bg-white p-2 rounded-1 lg:mx-10 lg:mt-0 lg:p-4" draggable>
+                    <div class="absolute left-0 top--10 font-size-4 color-#999 font-bold lg:font-size-5">{{ currentVideo.url }}</div>
+                    <div v-if="currentVideo.url" class="w-100%">
+                        <div class="w-100% flex items-center justify-center" v-if="!currentLoading">
+                            <video class="z-140 h-auto w-100% object-cover rounded-1" controls playsinline>
+                                <source :src="`${videoPath}/${currentVideo.url}`" type="video/mp4">
+                            </video>
+                        </div>
+                        <div v-else class="w-100% flex items-center justify-center h-90">
+                            <i class="i-svg-spinners-ring-resize font-size-12 color-#1677ff"></i>
+                        </div>
+                        <div class="flex" v-if="smallVideoList.length > 1">
+                            <div class="scrollbar-small-x fenjing-list">
+                                <div class="whitespace-nowrap">
+                                    <div v-for="(item, idx) in smallVideoList" :key="idx" :class="`fenjinCard ${item.selected ? 'active' : ''}`" @click="handleChangeShot(item)">
+                                        {{ idx + 1 }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-8% flex items-center justify-end" v-if="!currentVideo?.isMainVideo">
+                                <TheButton :title="t('workbench.views.setMainVideo')" class="topBtn" class-name="lh-10 h-10 color-#666 mt-2 ml-0 pl-0 pr-0 w-100%" @click="handleSetMainVideo" :loading="mainLoading">
+                                    <i class="i-bx-arrow-to-top font-size-6 color-#9f54ba"></i>
+                                </TheButton>
+                            </div>
+                        </div>
+                        <div class="mt-4 w-100% items-center justify-between lg:flex">
+                            <div class="flex">
+                                <TheButton @click="handleDownload" type="border" class-name="h-8 mr-4">
+                                    <i class="i-material-symbols-download-2-rounded"></i> {{ t('workbench.views.download') }}
+                                </TheButton>
+
+                            </div>
+                            <div class="share-list font-size-7">
+                                <a href="http://" target="_blank" class="lg:ml-6" rel="noopener noreferrer">
+                                    <i class="i-logos-twitter"></i>
+                                </a>
+                                <a href="http://" target="_blank" class="ml-6" rel="noopener noreferrer">
+                                    <i class="i-logos-discord-icon"></i>
+                                </a>
+                                <a href="http://" target="_blank" class="ml-6" rel="noopener noreferrer">
+                                    <i class="i-cib-wechat color-green"></i>
+                                </a>
+                                <a href="http://" target="_blank" class="ml-6" rel="noopener noreferrer">
+                                    <i class="i-logos-telegram"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="w-100% flex items-center justify-center h-120" v-else>
+                        <TheNoData />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<style scoped lang='scss'>
+.post-page {
+    background-color: #f1f2f6;
+
+    :deep() {
+        .topBtn {
+            padding: 0 4px;
+        }
+    }
+}
+
+.fenjing-list {
+    --at-apply: overflow-x-scroll overflow-y-hidden w-100% h-11 mt-2 py-1 px-2 rounded-1;
+    border: 1px solid #eee;
+}
+
+.fenjinCard {
+    border: 1px solid #eee;
+    --at-apply: w-7 h-7 mr-2 inline-block text-center lh-7 font-bold cursor-pointer;
+
+    &.active {
+        --at-apply: border-color-#9f54ba rounded-1 cursor-pointer;
+    }
+}
+
+.right-video-card {
+    border: 2px solid #ccc;
+    --at-apply: rounded-2 px-1 pb-1 mb-2 mr-2 lg:mr-0 w-40 lg:w-100%;
+
+    &.active {
+        border-color: #9f54ba;
+    }
+}
+
+.right-video-list {
+    height: calc(100vh - 4.5rem);
+    --at-apply: mt-3 pt-1 px-4 w-100% lg:w-47.5;
+}
+
+@media screen and (max-width: 1024px) {
+
+    :deep() {
+        .left-box .the-telescoping-box {
+            --at-apply: h-80;
+
+            .h-100vh {
+                height: 100%;
+            }
+        }
+
+        .story-list {
+            --at-apply: flex h-39 flex-row w-100%;
+
+            .post-item {
+                --at-apply: w-28 mr-2;
+            }
+        }
+    }
+
+    .right-video-list {
+        --at-apply: h-40 px-2;
+
+        .right-video-card {
+            --at-apply: mb-0;
+        }
+    }
+
+}
+</style>     

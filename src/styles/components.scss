@@ -1,0 +1,97 @@
+.btn {
+  --at-apply: px-4 font-size-4 lh-10 text-center select-none font-bold cursor-pointer flex justify-center items-center;
+}
+
+.btn.default {
+  background: #eee;
+  color: #666;
+}
+
+.btn.primary {
+  background: #9f54ba;
+  color: #fff;
+}
+
+.btn.primary:hover {
+  background: #c383dc;
+}
+
+.btn.border {
+  background: none;
+  border: 1px solid #9f54ba;
+  color: #9f54ba;
+}
+
+.btn.border:hover {
+  color: #b98ac9;
+  border-color: #b883cb;
+}
+
+input {
+  border: 1px solid #eee;
+  line-height: 36px;
+  border-radius: 6px;
+  padding: 0 8px;
+
+  &:hover {
+    border-color: #c6a4d1;
+  }
+}
+
+input:focus {
+  outline: 1px solid #9f54ba;
+}
+
+
+textarea {
+  background: #fff;
+  border: 1px solid #eee;
+  padding: 10px;
+  border-radius: 4px;
+  color: #000;
+  line-height: 20px;
+}
+
+textarea:hover {
+  border-color: #c6a4d1;
+}
+
+textarea:focus {
+  outline: 1px solid #9f54ba;
+}
+
+textarea::placeholder {
+  color: #ccc;
+}
+
+
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-small {
+  &-x {
+    --at-apply: overflow-x-scroll scrollbar-radius-2 scrollbar-thumb-radius-4 scrollbar-track-radius-4 scrollbar-w-1 scrollbar scrollbar-rounded lg:scrollbar-w-1;
+  }
+
+  &-y {
+    --at-apply: overflow-y-scroll scrollbar-radius-2 scrollbar-thumb-radius-4 scrollbar-track-radius-4 scrollbar-w-1 scrollbar scrollbar-rounded lg:scrollbar-w-1;
+  }
+}
+
+a {
+  color: #000;
+}
+
+
+@media screen and (max-width: 1024px) {
+  .btn {
+    --at-apply: px-2 font-size-3.5 lh-8;
+  }
+
+  input {
+    --at-apply: font-size-3 lh-8 h-8 px-1;
+    border-radius: 4px;
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.vitest.json"
+    }
+  ],
+  "compilerOptions": {
+    "module": "NodeNext",
+    "lib": [
+      "DOM",
+      "WebWorker"
+    ]
+  },
+  "include": [
+    "/src/api/*.ts",
+    "/src/components/*.vue",
+    "/src/enum/*.ts",
+    "/src/hooks/*.ts",
+    "/src/plugins/*.vue",
+    "/src/plugins/*.ts",
+    "/src/router/*.ts",
+    "/src/stores/*.ts",
+    "/src/utils/*.ts",
+    "/src/views/*.vue",
+    "/src/views/*/*.vue",
+    "/src/views/components/*.vue"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

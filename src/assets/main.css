@@ -1,0 +1,17 @@
+@import './base.css';
+
+
+@font-face{
+  font-family: 'YatraOne-Regular';
+  src : url('@/assets/fonts/YatraOne-Regular.ttf');
+}
+
+
+
+@media (min-width: 1024px) {
+  body {
+    display: flex;
+    place-items: center;
+  }
+
+}

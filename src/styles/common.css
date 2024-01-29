@@ -1,0 +1,20 @@
+.brand-tit {
+  font-family: YatraOne-Regular;
+}
+.app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+html,
+body {
+  min-height: 100vh;
+  height: auto;
+}
+
+#nprogress .bar {
+  background: #1677ff !important;
+  box-shadow:
+    0 0 6px #1677ff,
+    0 0 2px #1677ff !important;
+}
