@@ -21,7 +21,7 @@ const handleModif = async (e: StoryItem) => {
 }
 </script>
 <template>
-  <div class="scrollbar-small-y the-tab-library scrollbar-none max-h-auto p-2 lg:max-h-81 lg:p-4">
+  <div class="scrollbar-small-y the-tab-library scrollbar-none max-h-auto p-2 lg:p-4">
     <div v-if="storyListStore.list.length" class="flex flex-wrap">
       <div v-for="item in storyListStore.list" :key="item.id" class="story-card" @click="handleModif(item)">
         <div>

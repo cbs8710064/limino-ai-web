@@ -26,9 +26,14 @@ const handleMergeVideos = async () => {
     message.error(t('warnMessage.chooseMergeVideos'))
     return
   }
-  await mergerVideo(list)
-  mergeLoading.value = false
-  message.success(t('successMessage.mergeSuccess'))
+  try {
+    await mergerVideo(list)
+    message.success(t('successMessage.mergeSuccess'))
+  } catch (err) {
+    message.error(JSON.stringify(err))
+  } finally {
+    mergeLoading.value = false
+  }
 }
 </script>
 <template>

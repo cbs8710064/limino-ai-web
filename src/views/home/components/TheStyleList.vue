@@ -7,7 +7,7 @@ const styleListStore = useStyleListStore()
 const emits = defineEmits<{
   (e: 'change', val: StyleItem): void
 }>()
-const handleChoose = (e: any) => {
+const handleChoose = (e: StyleItem) => {
   const { id } = e;
   styleListStore.setSelectStyle(id)
   emits('change', e)

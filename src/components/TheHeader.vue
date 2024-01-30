@@ -40,7 +40,7 @@ useScroll(({ top }) => {
 })
 </script>
 <template>
-  <div :class="`the-header fixed left-0 right-0 top-0 px-4 lg:px-10 h-12 lg:h-16 ${hasBackground ? 'tarnsparent' : ''} ${scrollFlag ? 'the-header-fixed' : ''}`">
+  <div :class="`the-header fixed left-0 right-0 z-100 top-0 px-4 lg:px-10 h-12 lg:h-16 ${hasBackground ? 'tarnsparent' : ''} ${scrollFlag ? 'the-header-fixed' : ''}`">
     <div class="h-100% flex justify-between">
       <div class="flex items-center justify-center">
         <div class="brand-tit font-size-5 color-white font-bold lh-15 lg:font-size-8">{{ t('components.theHeader.companyTit') }}</div>
@@ -50,9 +50,6 @@ useScroll(({ top }) => {
           <i class="i-mingcute-diamond-2-line font-size-4 color-#9f54ba lg:font-size-6"></i>
           <span class="font-size-3 font-bold lg:font-size-4.4">1200</span> <i class="i-ic-outline-add font-size-5.4 font-bold"></i>
         </div>
-        <!-- <div>
-          <i :class="`i-ic-baseline-account-circle font-size-8 lg:font-size-10  ${scrollFlag ? 'color-white' : 'color-black '}`"></i>
-        </div> -->
         <RouterLink :class="`btn font-size-4 ${scrollFlag ? 'color-white' : 'color-black '}`" to="/login">{{ t('components.theHeader.signIn') }}</RouterLink>
         <TheDropdown :options="langs" class="ml-2" alignDirection="right" @change="handleChange" v-model="langVal">
           <div class="lang flex items-center justify-start rounded-full px-1.2 w-12 h-8">

@@ -97,17 +97,12 @@ export const mergerVideo = async (list: MergeList) => {
     console.log(e)
   })
   if (!ffmpeg.loaded) {
-    try {
-      const c = message.loading(i18n.global.t('loadingMessage.loadFFmpeg'), 0)
-      await ffmpeg.load({
-        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm')
-      })
-      c()
-    } catch (err) {
-      console.error(err)
-      message.error(i18n.global.t('errorMessage.loadFailed'))
-    }
+    const c = message.loading(i18n.global.t('loadingMessage.loadFFmpeg'), 0)
+    await ffmpeg.load({
+      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm')
+    })
+    c()
   }
   const e = message.loading(i18n.global.t('loadingMessage.mergeVideoing'), 0)
   let concatStr = 'concat:'
