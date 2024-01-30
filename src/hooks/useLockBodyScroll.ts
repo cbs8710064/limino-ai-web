@@ -3,19 +3,18 @@
  * @returns {UseLockBodyReturns}
  */
 
-import type { UseLockBodyReturns } from "@/types/hooks";
-
+import type { UseLockBodyReturns } from '@/types/hooks'
 
 export default function useLockBodyScroll(): UseLockBodyReturns {
-    const bodyStyle = document.body.style;
-    const lockBodyScroll = () => {
-        bodyStyle.overflow = 'hidden';
-    }
-    const unLockBodyScroll = () => {
-        bodyStyle.overflow = '';
-    }
-    return {
-        lockBodyScroll,
-        unLockBodyScroll
-    }
+  const bodyStyle = document.body.style
+  const lockBodyScroll = () => {
+    bodyStyle.overflow = 'hidden'
+  }
+  const unLockBodyScroll = () => {
+    bodyStyle.overflow = ''
+  }
+  return {
+    lockBodyScroll,
+    unLockBodyScroll
+  }
 }

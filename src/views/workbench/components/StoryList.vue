@@ -94,7 +94,7 @@ onUnmounted(() => {
 
 
                 </div>
-                <div class="overflow-hidden text-ellipsis whitespace-nowrap px-1 text-center font-size-3 font-bold lh-7 lg:font-size-3.5">{{ item.name }}</div>
+                <div class=" text-ellipsis whitespace-nowrap px-1 text-center font-size-3 font-bold lh-7 lg:font-size-3.5">{{ item.name }}</div>
             </div>
         </div>
         <div v-else class="scrollbar-small-y story-list2 px-2 pt-4 font-size-4 color-#ccc lg:px-4 lg:text-left">

@@ -9,7 +9,9 @@ export type StoryItem = {
   description: {
     chat_process: any[]
   }
-  roles: any[]
+  roles: {
+    roles: any[]
+  }
   id: number
   name: string
   url: string
@@ -72,8 +74,8 @@ export const useStoryListStore = defineStore('storyList', () => {
       const { chatIdx, roleIdx, shotIdx } = ids
       res.forEach((item: { roles: any; description: any; selected: boolean }) => {
         // item.selected = false
-        if (item.roles && item.roles.length) {
-          item.roles.forEach((role: { selected: boolean }, idx: number) => {
+        if (item.roles && item.roles.roles && item.roles.roles.length) {
+          item.roles.roles.forEach((role: { selected: boolean }, idx: number) => {
             const nowRoleIdx = roleIdx > -1 ? roleIdx : 0
             if (idx === nowRoleIdx) {
               ids.roleIdx = nowRoleIdx
@@ -208,8 +210,8 @@ export const useStoryListStore = defineStore('storyList', () => {
     ids.roleIdx = roleIdx || 0
     list.value.forEach((item) => {
       if (item.id === storyId) {
-        if (item.roles && item.roles.length) {
-          item.roles.forEach((child: { selected: boolean }, idx: number) => {
+        if (item.roles && item.roles.roles && item.roles.roles.length) {
+          item.roles.roles.forEach((child: { selected: boolean }, idx: number) => {
             if (idx === roleIdx) {
               child.selected = true
             } else {
@@ -225,8 +227,8 @@ export const useStoryListStore = defineStore('storyList', () => {
     let role: any = {}
     list.value.forEach((item) => {
       if (item.selected) {
-        if (item.roles) {
-          item.roles.find((child: { selected: boolean }) => {
+        if (item.roles.roles) {
+          item.roles.roles.find((child: { selected: boolean }) => {
             if (child.selected) {
               role = child
             }
@@ -242,8 +244,8 @@ export const useStoryListStore = defineStore('storyList', () => {
       const val = list.value.find((item) => item.selected)
       let idx = -1
       let chatIdx = -1
-      if (val && val.roles && val.roles.length) {
-        idx = val.roles.findIndex((child) => child.selected)
+      if (val && val.roles.roles && val.roles.roles.length) {
+        idx = val.roles.roles.findIndex((child) => child.selected)
       }
       if (
         val &&

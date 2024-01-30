@@ -66,8 +66,8 @@ const handleCreateCharacter = async () => {
 const handleChangeStory = (e: StoryItem) => {
     const { id } = e
     storyListStore.selectRoleByStoryId(Number(id), 0)
-    if (e.roles && e.roles.length) {
-        rolePrompt.value = e.roles[0].prompts
+    if (e.roles.roles && e.roles.roles.length) {
+        rolePrompt.value = e.roles.roles[0].prompts
     }
 }
 
@@ -98,18 +98,18 @@ watch(() => storyListStore.selectStoryRole, n => {
         <TheTelescoping direction="right" width="380px" class="left-box">
             <div class="h-auto pb-2 lg:h-100vh lg:flex lg:pb-0">
                 <StoryList @change="handleChangeStory" />
-                <div class="scrollbar-small-x lg:scrollbar-small-y character-list px-2 lg:px-4" v-if="storyListStore?.selectedStory?.roles && storyListStore?.selectedStory?.roles.length">
-                    <div @click="handleChangeRole({ ...item, idx })" :class="`character-card ${item.selected ? 'active' : ''}`" v-for="(item, idx) in storyListStore?.selectedStory?.roles" :key="idx">
+                <div class="scrollbar-small-x lg:scrollbar-small-y character-list px-2 lg:px-4" v-if="storyListStore?.selectedStory?.roles.roles && storyListStore?.selectedStory?.roles.roles.length">
+                    <div @click="handleChangeRole({ ...item, idx })" :class="`character-card ${item.selected ? 'active' : ''}`" v-for="(item, idx) in storyListStore?.selectedStory?.roles.roles" :key="idx">
                         <div class="character-card-img">
                             <div class="w-100%" v-if="item.image">
-                                <Image loading="lazy" :src="`${videoPath}/${item.image}`" :preview="false" class="object-contain w-20 rounded-1 lg:w-100%" width="100%" height="4.5rem lg:10rem"></Image>
+                                <Image loading="lazy" :src="`${videoPath}/${item.image}`" :preview="false" class="object-contain w-20 rounded-1 lg:w-100%" width="100%" height="10rem"></Image>
                                 <!-- <img :src="`${videoPath}/${item.image}`" class="object-contain w-20 rounded-1 lg:w-100%" alt=""> -->
                             </div>
                             <div class="flex items-center justify-center h-39" v-else>
                                 <i class="i-svg-spinners-ring-resize font-size-8 color-#1677ff"></i>
                             </div>
                         </div>
-                        <div class="px-1 font-size-3 lh-6 lg:font-size-3.5 lg:lh-9">{{ item.name }}</div>
+                        <div class="px-1 font-size-3 h-6 line-clamp-1 overflow-hidden text-ellipsis lh-6 lg:font-size-3.5 lg:lh-9">{{ item.name }}</div>
                     </div>
                 </div>
                 <div v-else class="h-100% w-100% p-4 text-center font-size-4 color-#ccc lg:text-left">

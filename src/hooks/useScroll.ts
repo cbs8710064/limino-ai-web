@@ -25,5 +25,4 @@ export default function useScroll(callBack: UseScrollCallback, delay: number = 2
   onUnmounted(() => {
     window.removeEventListener('scroll', scrollFun)
   })
-
 }

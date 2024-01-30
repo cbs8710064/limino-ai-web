@@ -10,15 +10,13 @@ const customPreset: Preset = {
     [/^right-(\d+)$/, ([_, val]) => ({ right: val + 'px' })],
     [/^w-(\d+)$/, ([, d]: any) => ({ width: `${d / 4}rem` })],
     [/^h-(\d+)$/, ([, d]: any) => ({ height: `${d / 4}rem` })],
-    [/^rounded-(\d+)$/, ([, d]: any) => ({ 'border-radius': `${d / 4}rem` })],
+    [/^rounded-(\d+)$/, ([, d]: any) => ({ 'border-radius': `${d / 4}rem` })]
   ]
 }
 
 export default defineConfig({
-  content: {
-
-  },
-  safelist:'w-100% rounded-3'.split(' '),
+  content: {},
+  safelist: 'w-100% rounded-3'.split(' '),
   transformers: [transformerDirectives()],
   // ...UnoCSS options
   presets: [
@@ -26,9 +24,7 @@ export default defineConfig({
     customPreset,
 
     presetIcons({
-      collections: {
-
-      },
+      collections: {},
       extraProperties: {
         display: 'inline-block',
         'vertical-align': 'middle'

@@ -16,8 +16,11 @@
     "isolatedModules": true,
     "lib": [
       "DOM",
-      "ES2015",
-    ]
+      "ESNext",
+    ],
+    "paths": {
+      
+    }
   },
   "include": [
     "/src/api/*.ts",
