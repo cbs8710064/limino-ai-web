@@ -60,7 +60,7 @@ const handleUpdateStoryCover = async () => {
     </TheTelescoping>
     <div class="middle-box scrollbar-small-y w-100% lg:h-93.3vh">
       <div class="min-h-40vh w-100% flex items-start justify-center py-4 lg:mt-10 lg:min-h-140 lg:items-center lg:py-10">
-        <div class="relative max-w-220 w-100% p-2 rounded-1 lg:mx-10 lg:mt-0 lg:min-h-100 lg:p-4">
+        <div class="relative max-w-220 w-100% px-4 py-2 rounded-1 lg:mx-10 lg:mt-0 lg:min-h-100 lg:p-4">
           <div v-if="storyListStore.selectedStory?.cover && !taskStore.tasks.gen_cover" class="bg-mask">
             <div class="flex justify-center">
               <Image loading="lazy" :src="`${videoPath}/${storyListStore.selectedStory.cover}`" :preview="false" class="w-100%"></Image>
@@ -134,7 +134,7 @@ const handleUpdateStoryCover = async () => {
         --at-apply: flex h-40 flex-row w-100%;
 
         .post-item {
-          --at-apply: min-w-28 mr-2;
+          --at-apply: min-w-28 mr-2 max-w-28;
         }
       }
     }

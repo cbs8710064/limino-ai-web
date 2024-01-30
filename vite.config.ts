@@ -1,15 +1,17 @@
 import { fileURLToPath, URL } from 'node:url'
 import UnoCSS from 'unocss/vite'
-import { defineConfig, splitVendorChunkPlugin } from 'vite'
+import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import Components from 'unplugin-vue-components/vite'
 import legacy from '@vitejs/plugin-legacy'
 // https://vitejs.dev/config/
 import { visualizer } from 'rollup-plugin-visualizer'
+
+console.log('import.meta.env', process.env.NODE_ENV)
+const isProd = process.env.NODE_ENV === 'production' ? true : false
 export default defineConfig({
   base: '/',
-
   plugins: [
     legacy({
       targets: ['since 2013'],
@@ -73,8 +75,8 @@ export default defineConfig({
     terserOptions: {
       compress: {
         // warnings: false,
-        // drop_console: true, //打包时删除console
-        drop_debugger: true, //打包时删除 debugger
+        drop_console: isProd ? true : false,
+        drop_debugger: isProd ? true : false,
         pure_funcs: ['console.log']
       },
       output: {
@@ -85,7 +87,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // manualChunks(id, e) {
-        //   // TODO 打包配置优化 console.log(id)
+        // TODO 打包配置优化 console.log(id)
         //   if (id.includes('node_modules')) {
         //     return 'vendor'
         //   }

@@ -94,22 +94,21 @@ watch(() => storyListStore.selectStoryRole, n => {
 
 </script>
 <template>
-    <div class="h-93.5vh lg:flex">
+    <div class="roles-page h-93.5vh lg:flex">
         <TheTelescoping direction="right" width="380px" class="left-box">
             <div class="h-auto pb-2 lg:h-100vh lg:flex lg:pb-0">
                 <StoryList @change="handleChangeStory" />
-                <div class="scrollbar-small-x lg:scrollbar-small-y character-list px-2 lg:px-4" v-if="storyListStore?.selectedStory?.roles.roles && storyListStore?.selectedStory?.roles.roles.length">
+                <div class="scrollbar-small-x lg:scrollbar-small-y character-list px-4 lg:px-4" v-if="storyListStore?.selectedStory?.roles.roles && storyListStore?.selectedStory?.roles.roles.length">
                     <div @click="handleChangeRole({ ...item, idx })" :class="`character-card ${item.selected ? 'active' : ''}`" v-for="(item, idx) in storyListStore?.selectedStory?.roles.roles" :key="idx">
                         <div class="character-card-img">
-                            <div class="w-100%" v-if="item.image">
-                                <Image loading="lazy" :src="`${videoPath}/${item.image}`" :preview="false" class="object-contain w-20 rounded-1 lg:w-100%" width="100%" height="10rem"></Image>
-                                <!-- <img :src="`${videoPath}/${item.image}`" class="object-contain w-20 rounded-1 lg:w-100%" alt=""> -->
+                            <div class="role-img w-100%" v-if="item.image">
+                                <Image loading="lazy" :src="`${videoPath}/${item.image}`" :preview="false" class="object-contain w-20 rounded-1 lg:w-100%" width="100%"></Image>
                             </div>
                             <div class="flex items-center justify-center h-39" v-else>
                                 <i class="i-svg-spinners-ring-resize font-size-8 color-#1677ff"></i>
                             </div>
                         </div>
-                        <div class="px-1 font-size-3 h-6 line-clamp-1 overflow-hidden text-ellipsis lh-6 lg:font-size-3.5 lg:lh-9">{{ item.name }}</div>
+                        <div class="line-clamp-1 overflow-hidden text-ellipsis px-1 font-size-3 lh-6 h-6 lg:font-size-3.5 lg:lh-9">{{ item.name }}</div>
                     </div>
                 </div>
                 <div v-else class="h-100% w-100% p-4 text-center font-size-4 color-#ccc lg:text-left">
@@ -135,7 +134,6 @@ watch(() => storyListStore.selectStoryRole, n => {
                         </Progress>
                         <div v-else class="flex items-center justify-center px-15 h-140">
                             <TheNoData />
-                            <!-- <img src="@/assets/images/placeholders/play.svg" class="w-100% object-contain h-100% rounded-1" alt=""> -->
                         </div>
                     </div>
                 </div>
@@ -143,7 +141,6 @@ watch(() => storyListStore.selectStoryRole, n => {
         </div>
         <TheTelescoping direction="left" width="300px" class="ipt-box">
             <div class="h-100vh px-4 lg:px-6">
-                <!-- <div class="mt-4 font-size-5 font-bold lh-10">{{ t('workbench.views.character.character') }}</div> -->
                 <div class="mt-2 font-bold lh-10">{{ t('workbench.views.character.name') }}</div>
                 <div><input type="text" readonly :value="selectStoryRole?.name" :placeholder="t('workbench.views.character.character')"></div>
                 <div class="mt-2 font-bold lh-10">{{ t('workbench.views.character.prompt') }}</div>
@@ -162,6 +159,18 @@ watch(() => storyListStore.selectStoryRole, n => {
     </div>
 </template>
 <style scoped lang='scss'>
+.roles-page {
+
+    .role-img {
+
+        :deep() {
+            .ant-image img {
+                height: 10rem !important;
+            }
+        }
+    }
+}
+
 .con {
     background-color: #f1f2f6;
 }
@@ -183,6 +192,8 @@ watch(() => storyListStore.selectStoryRole, n => {
         }
     }
 }
+
+
 
 .bg-mask {
     transition: ease .3s;
@@ -214,6 +225,11 @@ watch(() => storyListStore.selectStoryRole, n => {
     }
 
     :deep() {
+
+        .ant-image img {
+            height: 5.2rem !important;
+        }
+
         .ipt-box .the-telescoping-box {
             --at-apply: h-130;
 
@@ -223,7 +239,7 @@ watch(() => storyListStore.selectStoryRole, n => {
         }
 
         .left-box .the-telescoping-box {
-            --at-apply: h-76;
+            --at-apply: h-78;
 
             .h-100vh {
                 height: 100%;
@@ -234,7 +250,7 @@ watch(() => storyListStore.selectStoryRole, n => {
             --at-apply: flex h-40 flex-row w-100%;
 
             .post-item {
-                --at-apply: min-w-28 mr-2;
+                --at-apply: min-w-28 mr-2 max-w-28;
             }
         }
 

@@ -73,13 +73,10 @@ const handleSelect = (_e: any, idx: number) => {
     nextTick(() => {
       storyListStore.setChatSelected(idx)
       const v = _e.videos && _e.videos.length ? _e.videos[0] : { url: '', status: '' }
-
       currentVideo.value = {
         ...v,
         main_video: _e.main_video
       }
-
-
       createVideoLoading.value = false
     })
   }
@@ -212,19 +209,6 @@ const handleGetFenJing = async () => {
     await nextFenjing(Number(id), chatIdx)
     await loopHasFenjingTask()
     location.reload()
-    // const index = shots.value.findIndex((c: any) => c.selected)
-    // if (res.shots && res.shots.length) {
-    //   const arr = res.shots.map((item: string, idx: number) => {
-    //     return {
-    //       url: item,
-    //       selected: idx === index ? true : false,
-    //       idx
-    //     }
-    //   })
-
-    //   shots.value = arr;
-    // }
-    // loadingFenJing.value = false
   }
 }
 
@@ -236,7 +220,7 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
       <div class="lg:flex">
         <StoryList @change="handleChangeStory" />
         <div class="max-h-35 w-100% lg:max-h-93.2vh">
-          <div class="scrollbar-small-x lg:scrollbar-small-y panel-list max-h-35 px-2 lg:max-h-84vh lg:px-4" v-if="storyListStore.selectedStory?.description?.chat_process && storyListStore.selectedStory?.description?.chat_process.length">
+          <div class="scrollbar-small-x lg:scrollbar-small-y panel-list max-h-35 px-4 lg:max-h-84vh lg:px-4" v-if="storyListStore.selectedStory?.description?.chat_process && storyListStore.selectedStory?.description?.chat_process.length">
             <div v-for="(item, idx) in storyListStore.selectedStory?.description?.chat_process" :key="item.id" @click="handleSelect(item, idx)" :class="`panel-item ${item.selected ? 'active' : ''}`">
               <div class="flex items-center justify-center h-4" v-if="item.process">
                 <div class="h-4" v-if="item.process === 1 || item.process === 2" :title="t('common.creating')">
@@ -248,7 +232,7 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
               </div>
               <div>
                 <div class="font-bold">Page{{ idx + 1 }}</div>
-                <div class="line-clamp-4 overflow-hidden text-ellipsis text-left font-size-3 w-30 h-20">{{ item.text_en ? item.text_en : item.text }}</div>
+                <div class="line-clamp-4 overflow-hidden text-ellipsis text-left font-size-3 w-30 h-20">{{ item.text }}</div>
               </div>
             </div>
           </div>
@@ -271,11 +255,6 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
                 <video class="z-140 w-100% bg-#ccc object-cover rounded-1" controls playsinline>
                   <source :src="`${videoPath}/${currentVideo.main_video}`" type="video/mp4">
                 </video>
-                <!-- <div class="video-info absolute bottom-0 left-0 bg-white right-0 h-30">
-                  <div class="flex flex-row items-end justify-center h-30">
-                    <div class="overflow-hidden px-4 py-2 font-size-3.4 font-bold">{{ storyListStore.selectedChat.text }}</div>
-                  </div>
-                </div> -->
               </div>
             </div>
           </div>
@@ -395,7 +374,7 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
 @media screen and (max-width: 1024px) {
   :deep() {
     .ipt-box .the-telescoping-box {
-      --at-apply: h-75.8;
+      --at-apply: h-79;
 
       .h-100vh {
         height: 100%;
@@ -410,7 +389,7 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
       --at-apply: flex h-40 flex-row w-100%;
 
       .post-item {
-        --at-apply: min-w-28 mr-2;
+        --at-apply: min-w-28 mr-2 max-w-28;
       }
     }
 

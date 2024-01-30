@@ -29,7 +29,7 @@ useScroll(({ top, direction }) => {
 }, 10)
 </script>
 <template>
-    <div :class="`step-nav flex justify-between px-2 px-2 h-16 lg:h-auto lg:flex-row lg:flex-col lg:justify-start lg:px-0 ${fixedClass} ${scrollUpClass}`">
+    <div :class="`step-nav flex justify-between px-4 h-16 lg:h-auto lg:flex-row lg:flex-col lg:justify-start lg:px-0 ${fixedClass} ${scrollUpClass}`">
         <RouterLink to="/" class="flex items-center justify-center">
             <div class="brand-tit text-center font-size-4 color-white font-bold lg:mb-10 lg:pt-10">{{ t('workbench.brandTit') }}</div>
         </RouterLink>

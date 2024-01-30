@@ -41,7 +41,7 @@ const handleCopy = (str: string) => {
         <div v-if="loading" class="h-80vh flex items-center justify-center">
             <i class="i-svg-spinners-ring-resize mr-2 font-size-18 color-blue"></i>
         </div>
-        <div class="scrollbar-small-y m-auto h-88vh w-300" v-else>
+        <div class="scrollbar-small-y m-auto h-88vh max-w-300" v-else>
             <Collapse v-model:activeKey="activeKey">
 
                 <CollapsePanel v-for="(item, idx) in logs" :key="idx" :header="item.story_name || 'null'">

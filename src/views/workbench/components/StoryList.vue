@@ -63,7 +63,7 @@ onUnmounted(() => {
 </script>
 <template>
     <div>
-        <div class="scrollbar-small-x lg:scrollbar-small-y story-list px-2 pt-4 lg:px-4" v-if="storyListStore.list.length">
+        <div class="scrollbar-small-x lg:scrollbar-small-y story-list px-4 pt-4 lg:px-4" v-if="storyListStore.list.length">
             <div :class="`post-item ${item.selected ? 'active' : ''}`" v-for="item in storyListStore.list" :key="item.id" @click.stop="handleChooseStory(item)">
                 <div class="absolute top-0 z-1000 mb-1 flex items-center justify-between right-0">
                     <div class="flex cursor-pointer items-center font-size-5" v-if="hasBtns">
@@ -94,7 +94,7 @@ onUnmounted(() => {
 
 
                 </div>
-                <div class=" text-ellipsis whitespace-nowrap px-1 text-center font-size-3 font-bold lh-7 lg:font-size-3.5">{{ item.name }}</div>
+                <div class="text-ellipsis whitespace-nowrap px-1 text-center font-size-3 font-bold lh-7 lg:font-size-3.5">{{ item.name }}</div>
             </div>
         </div>
         <div v-else class="scrollbar-small-y story-list2 px-2 pt-4 font-size-4 color-#ccc lg:px-4 lg:text-left">

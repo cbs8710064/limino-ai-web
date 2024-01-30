@@ -1,6 +1,6 @@
 /* scrollBar */
 :root {
-  --scrollbar-track-color: #e9e9e9;
+  --scrollbar-track-color: #ffffff;
   --scrollbar-thumb-color: #cdcbcb;
   --scrollbar-width: 4px;
 }

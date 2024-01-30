@@ -15,7 +15,6 @@ import i18n from './languages'
 import BackTopPlugin from './plugins/backTopPlugin/install'
 const pinia = createPinia()
 const app = createApp(App)
-console.warn('directives', directives)
 Object.keys(directives).forEach((key) => {
   const dircts: any = directives
   app.directive(key, dircts[key])

@@ -169,7 +169,7 @@ onUnmounted(() => {
             </div>
         </TheTelescoping>
 
-        <div class="story-right scrollbar-small-y my-4 w-100% flex-grow-1 bg-white px-2 pb-2 rounded-2 lg:m-6 lg:px-4 lg:pb-0">
+        <div class="story-right scrollbar-small-y my-4 w-100% flex-grow-1 bg-white px-4 pb-2 rounded-2 lg:m-6 lg:px-4 lg:pb-0">
             <!-- <div class="py-1 font-size-4 font-bold lg:py-3 lg:font-size-5">{{ t('workbench.views.story.tellAStory') }}</div>
             <div class="font-size-3 color-gray lg:font-size-3.3">{{ t('workbench.views.story.iptContent') }}</div> -->
             <div class="mt-2 lg:mt-4">
@@ -177,7 +177,7 @@ onUnmounted(() => {
                     <div class="mb-10" v-if="(storyStep === 1 || storyStep === 2) && !storyListStore.selectedStory">
                         <div v-if="storyStep === 1">
                             <div class="mt-4 lg:flex">
-                                <div class="w-60">
+                                <div class="w-100% lg:w-60">
                                     <div class="font-size-4 font-bold">{{ t('home.pieceTit') }}</div>
                                     <input maxlength="64" type="text" v-focus v-model="newStoryVal.name" class="mt-2 w-100%" :placeholder="t('home.pieceIptPlaceholder')">
                                 </div>
@@ -204,7 +204,7 @@ onUnmounted(() => {
             </div>
         </div>
         <TheTelescoping direction="left" width="350px" class="right-box">
-            <div class="px-4">
+            <div class="pl-4 pt-4">
                 <div class="mt-5 font-size-4 font-bold">{{ t('home.chooseStyleTit') }}</div>
                 <div class="scrollbar-small-y choose-list mt-4 flex flex-wrap lg:max-h-50vh">
                     <div v-for="item in list" :key="item.id" @click="handleChoose(item)" :class="`style-card ${item.checked ? 'activite' : ''}`">
@@ -294,7 +294,7 @@ onUnmounted(() => {
             --at-apply: flex h-40 flex-row w-100%;
 
             .post-item {
-                --at-apply: min-w-28 mr-2;
+                --at-apply: min-w-28 mr-2 max-w-28;
             }
         }
     }

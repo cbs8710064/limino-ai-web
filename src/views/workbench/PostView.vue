@@ -308,7 +308,7 @@ const smallVideoList = computed(() => {
 
 .right-video-list {
     height: calc(100vh - 4.5rem);
-    --at-apply: mt-3 pt-1 px-4 w-100% lg:w-47.5;
+    --at-apply: lg:mt-3 pt-1 px-2 w-100% lg:w-47.5;
 }
 
 @media screen and (max-width: 1024px) {
@@ -332,7 +332,7 @@ const smallVideoList = computed(() => {
     }
 
     .right-video-list {
-        --at-apply: h-40 px-2;
+        --at-apply: h-40 px-4;
 
         .right-video-card {
             --at-apply: mb-0;

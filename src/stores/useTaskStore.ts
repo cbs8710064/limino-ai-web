@@ -2,7 +2,7 @@ import { useRequest } from '@/api/useRequest'
 import { defineStore } from 'pinia'
 import { ref, type Ref } from 'vue'
 const { getTasks } = useRequest()
-
+import { ids, setIds, getIds } from '@/stores/useStoryListStore'
 export type TaskType = 'gen_video' | 'gen_shots' | 'gen_role' | 'gen_cover' | 'init_story'
 type TaskResponse = {
   args: any[]
@@ -75,8 +75,6 @@ export const useTaskStore = defineStore('taskStore', () => {
 
   const loopTasks = async (taskStatus: number = 2, type: TaskType, loopDelay: number = 5000) => {
     if (tasksTime[type]) {
-      console.log('---loop', 0)
-
       clearLoop()
     }
     if (loopDelay < 5000) {
@@ -91,6 +89,9 @@ export const useTaskStore = defineStore('taskStore', () => {
           updateTaskState(type, null)
           clearInterval(tasksTime[type] as TimeType)
           if (type === 'gen_cover' || type === 'gen_role' || type === 'gen_shots') {
+            if (ids) {
+              setIds(ids)
+            }
             location.reload()
           }
         }

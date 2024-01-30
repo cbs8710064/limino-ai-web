@@ -48,18 +48,36 @@ export type MergeList = Array<{
   idx: number
   url: string
 }>
-const { getStories, deleteStory } = useRequest()
-// Solve the problem of reassigning selected to true during rotation
-const ids: {
+
+type TypeIds = {
   storyIdx: number // selected story idx
   chatIdx: number // selected chat idx
   roleIdx: number // selected role idx
   shotIdx: number // selected shot idx
-} = {
+}
+const idsKey = 'ids'
+const { getStories, deleteStory } = useRequest()
+const newIds = getIds()
+
+localStorage.removeItem(idsKey)
+// Solve the problem of reassigning selected to true during rotation
+export const ids: TypeIds = newIds || {
   storyIdx: 0,
   chatIdx: 0,
   roleIdx: 0,
   shotIdx: 0
+}
+// 用于同步任务队列结束后刷新页面保存刷新前列表选中的值
+export function setIds(v: TypeIds | null) {
+  if (v) {
+    localStorage.setItem(idsKey, JSON.stringify(v))
+  }
+}
+
+export function getIds() {
+  const idData = localStorage.getItem(idsKey)
+  const val = idData ? JSON.parse(idData) : null
+  return val
 }
 
 let flag = false
@@ -72,24 +90,36 @@ export const useStoryListStore = defineStore('storyList', () => {
     const res = await getStories()
     if (res && res.length) {
       const { chatIdx, roleIdx, shotIdx } = ids
-      res.forEach((item: { roles: any; description: any; selected: boolean }) => {
+      res.forEach((item: { language: any; roles: any; description: any; selected: boolean }) => {
         // item.selected = false
         if (item.roles && item.roles.roles && item.roles.roles.length) {
-          item.roles.roles.forEach((role: { selected: boolean }, idx: number) => {
-            const nowRoleIdx = roleIdx > -1 ? roleIdx : 0
-            if (idx === nowRoleIdx) {
-              ids.roleIdx = nowRoleIdx
-              role.selected = true
-            } else {
-              role.selected = false
+          item.roles.roles.forEach(
+            (
+              role: {
+                name_en: any
+                name: any
+                text: any
+                selected: boolean
+              },
+              idx: number
+            ) => {
+              const nowRoleIdx = roleIdx > -1 ? roleIdx : 0
+              if (idx === nowRoleIdx) {
+                ids.roleIdx = nowRoleIdx
+                role.selected = true
+              } else {
+                role.selected = false
+              }
             }
-          })
+          )
         }
         if (item.description && item.description.chat_process.length) {
           const nowChatIdx = chatIdx > -1 ? chatIdx : 0
           item.description.chat_process.forEach(
             (
               child: {
+                text: any
+                text_en: any
                 totalVideos: any
                 process: any
                 videos: any
@@ -99,6 +129,7 @@ export const useStoryListStore = defineStore('storyList', () => {
               idx: number
             ) => {
               // console.warn('nowShotIdx---', ids)
+              child.text = child.text_en || child.text
               // 处理故事选中数据
               if (idx === nowChatIdx) {
                 child.selected = true
