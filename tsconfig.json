@@ -12,10 +12,11 @@
     }
   ],
   "compilerOptions": {
-    "module": "NodeNext",
+    "module": "ESNext",
+    "isolatedModules": true,
     "lib": [
       "DOM",
-      "WebWorker"
+      "ES2015",
     ]
   },
   "include": [

@@ -34,11 +34,6 @@ onMounted(async () => {
   eventBus.on('headerNextEvent', (): void => {
     router.push({ name: 'post' })
   })
-  eventBus.on('storyListLoaded', () => {
-    // nextTick(() => {
-    //   handleGetFenJing()
-    // })
-  })
   taskStore.loopTasks(2, 'gen_video')
 
 
@@ -233,7 +228,7 @@ const handleGetFenJing = async () => {
   }
 }
 
-const currentChatContent = computed(() => storyListStore.selectedChat && storyListStore.selectedChat.text ? storyListStore.selectedChat.text : '')
+const currentChatContent = computed(() => storyListStore.selectedChat && storyListStore.selectedChat.text_en ? storyListStore.selectedChat.text_en : (storyListStore.selectedChat.text || ''))
 </script>
 <template>
   <div class="paragraph-page lg:flex">
@@ -253,7 +248,7 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
               </div>
               <div>
                 <div class="font-bold">Page{{ idx + 1 }}</div>
-                <div class="line-clamp-4 overflow-hidden text-ellipsis text-left font-size-3 w-30 h-20">{{ item.text }}</div>
+                <div class="line-clamp-4 overflow-hidden text-ellipsis text-left font-size-3 w-30 h-20">{{ item.text_en ? item.text_en : item.text }}</div>
               </div>
             </div>
           </div>
