@@ -11,6 +11,7 @@ type TaskResponse = {
   status: number
   user: string
 }
+type TimeType = ReturnType<typeof setInterval>
 export const useTaskStore = defineStore('taskStore', () => {
   const tasks: Ref<{ [key in TaskType]: any }> = ref({
     gen_video: null,
@@ -19,7 +20,16 @@ export const useTaskStore = defineStore('taskStore', () => {
     gen_cover: null,
     init_story: null
   })
-  let time: ReturnType<typeof setInterval>
+
+  const tasksTime: {
+    [key in TaskType]: TimeType | null
+  } = {
+    gen_video: null,
+    gen_shots: null,
+    gen_role: null,
+    gen_cover: null,
+    init_story: null
+  }
   const updateTaskState = (type: TaskType, val: TaskResponse | null) => {
     switch (type) {
       case 'gen_cover':
@@ -36,12 +46,11 @@ export const useTaskStore = defineStore('taskStore', () => {
         return
       case 'init_story':
         // eslint-disable-next-line no-case-declarations
-        let storyId: any = null
+        let storyId: number | null = null
         if (val) {
           const { args }: any = val
           args && args.length ? (storyId = args[0]) : ''
         }
-
         tasks.value.init_story = { ...val, storyId }
         return
     }
@@ -65,7 +74,9 @@ export const useTaskStore = defineStore('taskStore', () => {
   }
 
   const loopTasks = async (taskStatus: number = 2, type: TaskType, loopDelay: number = 5000) => {
-    if (time) {
+    if (tasksTime[type]) {
+      console.log('---loop', 0)
+
       clearLoop()
     }
     if (loopDelay < 5000) {
@@ -73,23 +84,42 @@ export const useTaskStore = defineStore('taskStore', () => {
     }
     try {
       await handleTask(taskStatus, type)
-      time = setInterval(async () => {
+      tasksTime[type] = setInterval(async () => {
         try {
           await handleTask(taskStatus, type)
         } catch (e) {
           updateTaskState(type, null)
-          clearInterval(time)
-          location.reload()
+          clearInterval(tasksTime[type] as TimeType)
+          if (type === 'gen_cover' || type === 'gen_role' || type === 'gen_shots') {
+            location.reload()
+          }
         }
       }, loopDelay)
     } catch (err: any) {
       updateTaskState(type, null)
-      clearInterval(time)
+      clearInterval(tasksTime[type] as TimeType)
     }
   }
 
   const clearLoop = () => {
-    time ? clearInterval(time) : ''
+    let key: TaskType
+    for (key in tasksTime) {
+      if (key === 'gen_cover') {
+        tasksTime.gen_cover ? clearInterval(tasksTime.gen_cover) : ''
+      }
+      if (key === 'gen_role') {
+        tasksTime.gen_role ? clearInterval(tasksTime.gen_role) : ''
+      }
+      if (key === 'gen_shots') {
+        tasksTime.gen_shots ? clearInterval(tasksTime.gen_shots) : ''
+      }
+      if (key === 'gen_video') {
+        tasksTime.gen_video ? clearInterval(tasksTime.gen_video) : ''
+      }
+      if (key === 'init_story') {
+        tasksTime.init_story ? clearInterval(tasksTime.init_story) : ''
+      }
+    }
   }
 
   return {

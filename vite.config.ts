@@ -73,7 +73,7 @@ export default defineConfig({
     terserOptions: {
       compress: {
         // warnings: false,
-        drop_console: true, //打包时删除console
+        // drop_console: true, //打包时删除console
         drop_debugger: true, //打包时删除 debugger
         pure_funcs: ['console.log']
       },
