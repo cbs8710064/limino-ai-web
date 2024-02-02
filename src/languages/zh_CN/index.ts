@@ -154,7 +154,9 @@ export default {
     storyCoverUpdateSuccess: '该故事封面已加入重绘队列，请耐心等待',
     setMainVideoSuccess: '设为主视频成功',
     mergeSuccess: '合并成功',
-    chooseStyle: '请选择风格'
+    chooseStyle: '请选择风格',
+    emailSuccess: '已提交申请加入白名单，请耐心等待',
+    loginSuccess: '登录成功'
   },
   errorMessage: {
     createStoryFailed: '创建故事失败',

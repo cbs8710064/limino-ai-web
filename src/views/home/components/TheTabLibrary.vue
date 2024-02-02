@@ -80,12 +80,11 @@ watch(() => showVideo.value, (n) => {
 </template>
 <style scoped lang='scss'>
 .story-card {
-  --at-apply: w-47% lg:w-23% h-70 lg:h-58 rounded-1 flex justify-center items-center mx-1.1 lg:mx-2 mb-2 lg:mb-5 cursor-pointer relative overflow-hidden;
+  --at-apply: w-47% lg:w-23% h-70 lg:h-58 rounded-1 flex justify-center items-center mx-1.1 lg:mx-1% mb-2 lg:mb-5 cursor-pointer relative overflow-hidden;
   border: 1px solid #ccc;
   width: 100%;
   background-size: 200%;
   transition: ease .3s;
-  /* background: radial-gradient( rgb(184, 182, 182) 40%,transparent 100%); */
 
   &::before {
     content: '';
@@ -94,8 +93,6 @@ watch(() => showVideo.value, (n) => {
     right: 0;
     top: 0;
     bottom: 0;
-    /* background: radial-gradient(transparent 60%, rgb(184, 182, 182) 100%); */
-    /* background: rgba($color: #000000, $alpha: .5); */
     backdrop-filter: saturate(20%) blur(10px);
     -webkit-backdrop-filter: saturate(20%) blur(10px);
     background: rgba(27, 27, 27, .4);

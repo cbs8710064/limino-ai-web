@@ -158,7 +158,9 @@ export default {
 
     setMainVideoSuccess: 'Set to main video successfully',
     mergeSuccess: 'The merge was successful',
-    chooseStyle: 'Please select a style'
+    chooseStyle: 'Please select a style',
+    emailSuccess: 'An application has been submitted to join the whitelist, please be patient',
+    loginSuccess: 'Login successful'
   },
   errorMessage: {
     createStoryFailed: 'Failed to create a story',

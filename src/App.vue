@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 import { useI18n } from 'vue-i18n';
-import { onMounted, computed } from 'vue';
+import { onMounted } from 'vue';
 import { createUUID } from './utils/utils';
 import { uuidKey } from './const/index';
-import { ConfigProvider } from 'ant-design-vue'
+import { ConfigProvider, StyleProvider } from 'ant-design-vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import enUS from 'ant-design-vue/es/locale/en_US'
 const { locale } = useI18n()
@@ -18,7 +18,9 @@ onMounted(() => {
 
 <template>
   <ConfigProvider :locale="locale === 'zh-CN' ? zhCN : enUS">
-    <RouterView />
+    <StyleProvider hash-priority="high">
+      <RouterView />
+    </StyleProvider>
   </ConfigProvider>
 </template>
 

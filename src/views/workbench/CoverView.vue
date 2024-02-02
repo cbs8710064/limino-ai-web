@@ -63,7 +63,7 @@ const handleUpdateStoryCover = async () => {
       <div class="min-h-40 w-100% flex items-start justify-center py-4 lg:mt-10 lg:min-h-140 lg:items-center lg:py-10">
         <div class="relative max-w-220 w-100% px-4 py-2 rounded-1 lg:mx-10 lg:mt-0 lg:min-h-100 lg:p-4">
           <div v-if="storyListStore.selectedStory?.cover && !taskStore.tasks.gen_cover" class="bg-mask">
-            <div class="flex justify-center">
+            <div class="flex justify-center py-4">
               <Image loading="lazy" :src="`${videoPath}/${storyListStore.selectedStory.cover}`" :preview="false" class="w-100%"></Image>
             </div>
           </div>

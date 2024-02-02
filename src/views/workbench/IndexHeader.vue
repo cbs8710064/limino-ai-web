@@ -1,49 +1,11 @@
 <script setup lang='ts'>
 import { ref } from 'vue';
 import UserScoreModal from './components/UserScoreModal.vue';
-import { useCreateStore } from '../../stores/useCreateStore';
-import { useI18n } from 'vue-i18n';
-import { mergerVideo } from '../../utils/utils';
-import { useMessage } from '../../hooks/useMessage';
-import TheButton from '@/components/TheButton.vue';
-import { useStoryListStore } from '../../stores/useStoryListStore';
-
-const message = useMessage()
-const { t } = useI18n()
 const scoreModal = ref(false)
-const createStore = useCreateStore()
-const storyListStore = useStoryListStore()
-const { getMainVideoList } = storyListStore
 const handleScoreAdd = () => {
   scoreModal.value = true
 }
 
-const mergeLoading = ref(false)
-const handleMergeVideos = async () => {
-  mergeLoading.value = true
-  const list = getMainVideoList()
-  // const list = [
-  //   { url: 'https://test.limino.ai/assets/video-0-0.mp4', idx: 1 },
-  //   { url: 'https://test.limino.ai/assets/video-1-0.mp4', idx: 2 },
-  //   { url: 'https://test.limino.ai/assets/video-2-0.mp4', idx: 3 },
-  //   { url: 'https://test.limino.ai/assets/video-3-0.mp4', idx: 4 },
-  //   { url: 'https://test.limino.ai/assets/video-4-0.mp4', idx: 5 },
-  //   { url: 'https://test.limino.ai/assets/video-5-0.mp4', idx: 6 },
-  // ]
-  if (!list.length) {
-    message.error(t('warnMessage.chooseMergeVideos'))
-    return
-  }
-  try {
-    await mergerVideo(list)
-    message.success(t('successMessage.mergeSuccess'))
-  } catch (err) {
-    console.error(err)
-    message.error(JSON.stringify(err))
-  } finally {
-    mergeLoading.value = false
-  }
-}
 </script>
 <template>
   <div class="index-header">
@@ -52,10 +14,8 @@ const handleMergeVideos = async () => {
         <slot></slot>
       </div>
       <div class="flex items-center justify-end">
-        <TheButton :loading="mergeLoading" type="primary" class="mr-4 min-w-20 lh-8 h-8 lg:min-w-26" rounded v-if="createStore.step === 5 && storyListStore.selectStoryHasVideo" @click="handleMergeVideos">
-          <i class="i-mdi-table-merge-cells mr-2 font-size-5"></i> {{ t('workbench.components.step.post') }}
-        </TheButton>
-        <div class="row-line mr-4" v-if="createStore.step === 5 && storyListStore.selectStoryHasVideo"></div>
+
+        <!-- <div class="row-line mr-4" v-if="createStore.step === 5 && storyListStore.selectStoryHasVideo"></div> -->
         <div class="account-scores" @click="handleScoreAdd">
           <i class="i-mingcute-diamond-2-line font-size-4 color-#9f54ba lg:font-size-6"></i>
           <span class="font-size-3 font-bold lg:font-size-4.4">1200</span> <i class="i-ic-outline-add font-size-5.4 font-bold"></i>

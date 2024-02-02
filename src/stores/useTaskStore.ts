@@ -11,6 +11,9 @@ type TaskResponse = {
   status: number
   user: string
 }
+type TaskTime = {
+  [key in TaskType]: TimeType | null
+}
 type TimeType = ReturnType<typeof setInterval>
 export const useTaskStore = defineStore('taskStore', () => {
   const tasks: Ref<{ [key in TaskType]: any }> = ref({
@@ -21,9 +24,7 @@ export const useTaskStore = defineStore('taskStore', () => {
     init_story: null
   })
 
-  const tasksTime: {
-    [key in TaskType]: TimeType | null
-  } = {
+  const tasksTime: TaskTime = {
     gen_video: null,
     gen_shots: null,
     gen_role: null,
@@ -33,16 +34,10 @@ export const useTaskStore = defineStore('taskStore', () => {
   const updateTaskState = (type: TaskType, val: TaskResponse | null) => {
     switch (type) {
       case 'gen_cover':
-        tasks.value.gen_cover = val
-        return
       case 'gen_role':
-        tasks.value.gen_role = val
-        return
       case 'gen_shots':
-        tasks.value.gen_shots = val
-        return
       case 'gen_video':
-        tasks.value.gen_video = val
+        tasks.value[type] = val
         return
       case 'init_story':
         // eslint-disable-next-line no-case-declarations

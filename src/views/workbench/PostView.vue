@@ -8,10 +8,8 @@ import { useI18n } from 'vue-i18n';
 import StoryList from '@/views/workbench/components/StoryList.vue'
 import { useStoryListStore } from '../../stores/useStoryListStore';
 import TheNoData from '@/components/TheNoData.vue';
-import { Image, message } from 'ant-design-vue'
-import { useRequest } from '../../api/useRequest';
+import { Image } from 'ant-design-vue'
 import { videoPath } from '../../const/index';
-const { setMainVideo } = useRequest()
 
 const currentLoading = ref(false)
 const { t } = useI18n()
@@ -27,10 +25,6 @@ const storyListStore = useStoryListStore()
 
 const currentVideo: any = ref({ url: '' })
 const currentUrl: Ref<string> = ref('')
-
-const handleDownload = () => {
-    FileSaver.saveAs(videoPath + '/' + currentVideo.value.url, `${new Date().getTime()}.mp4`);
-}
 
 const handleSelect = (e: VideoItem, i: number) => {
     if (e.selected) {
@@ -129,53 +123,11 @@ const handleChangeStory = () => {
     getVideoList()
 }
 
-
-const handleChangeShot = (e: any) => {
-    if (e.selected) {
-        return
-    }
-    currentLoading.value = true
-    nextTick(() => {
-        fenJingList.list[videoIndex.value].forEach((item: any) => {
-            if (item.idx === e.idx) {
-                item.selected = true
-                currentVideo.value = e
-            } else {
-                item.selected = false
-            }
-        })
-        currentLoading.value = false
-    })
+const mergeLoading = ref(false)
+const handleMerge = () => {
+    // TODO send request for merge videos
+    FileSaver.saveAs(videoPath + '/' + currentVideo.value.url, `${new Date().getTime()}.mp4`);
 }
-
-const mainLoading = ref(false)
-const handleSetMainVideo = async () => {
-    try {
-        mainLoading.value = true
-        const { url, chatIdx } = currentVideo.value
-        const { id } = storyListStore.getSelectedIdAndIdx()
-        if (id) {
-            const res = await setMainVideo(id, chatIdx, url)
-            if (res.error) {
-                message.error(t('errorMessage.setMainVideoFailed'))
-            } else {
-                message.success(t('successMessage.setMainVideoSuccess'))
-                getVideoList()
-            }
-        }
-    } finally {
-        mainLoading.value = false
-    }
-}
-
-const smallVideoList = computed(() => {
-    if (fenJingList.list && fenJingList.list[videoIndex.value]) {
-        return fenJingList.list[videoIndex.value]
-    }
-    return []
-})
-
-
 
 </script>
 <template>
@@ -193,7 +145,6 @@ const smallVideoList = computed(() => {
                                 </div>
                             </div>
                             <Image loading="lazy" v-if="item.status === 3 || !item.status" class="z-140 h-auto w-[100%] object-cover rounded-1" :preview="false" :src="`${videoPath}/${item.cover}`"></Image>
-                            <!-- <img v-if="item.status === 3 || !item.status" class="z-140 h-auto w-[100%] object-cover rounded-1" :src="`${videoPath}/${item.cover}`" alt=""> -->
                             <div class="flex items-center justify-center pb-2 h-26" v-else>
                                 <div v-if="item.status === 1 || item.status === 2">
                                     <div class="text-center"><i class="i-svg-spinners-ring-resize font-size-8"></i></div>
@@ -243,10 +194,12 @@ const smallVideoList = computed(() => {
                             </div> -->
                             <div class="mt-4 w-100% items-center justify-between lg:flex">
                                 <div class="flex">
-                                    <TheButton @click="handleDownload" type="border" class-name="h-8 mr-4">
+                                    <!-- <TheButton @click="handleDownload" type="border" class-name="h-8 mr-4">
                                         <i class="i-material-symbols-download-2-rounded"></i> {{ t('workbench.views.download') }}
+                                    </TheButton> -->
+                                    <TheButton :loading="mergeLoading" type="border" class="mr-4 min-w-20 lh-8 h-8 lg:min-w-26" rounded v-if="createStore.step === 5 && storyListStore.selectStoryHasVideo" @click="handleMerge">
+                                        <i class="i-mdi-table-merge-cells mr-2 font-size-5"></i> {{ t('workbench.components.step.post') }}
                                     </TheButton>
-
                                 </div>
                                 <div class="share-list font-size-7">
                                     <a href="http://" target="_blank" class="lg:ml-6" rel="noopener noreferrer">

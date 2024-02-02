@@ -121,7 +121,9 @@ watch(() => storyListStore.selectStoryRole, n => {
         <div class="con scrollbar-small-y w-100% px-4 py-4 lg:h-93vh lg:px-10 lg:py-10">
             <div class="h-100% w-100% flex items-center justify-center">
                 <div :class="`relative w-100% flex items-center rounded-1 justify-center px-2 h-auto max-h-140 lg:min-h-140 ${selectStoryRole?.image && !taskStore.tasks.gen_role ? 'bg-mask' : 'bg-white'}`">
-                    <img v-if="!taskStore.tasks.gen_role && selectStoryRole?.image" :src="`${videoPath}/${selectStoryRole?.image}`" class="w-100% object-contain h-140 rounded-1" alt="">
+                    <div v-if="!taskStore.tasks.gen_role && selectStoryRole?.image">
+                        <img :src="`${videoPath}/${selectStoryRole?.image}`" class="w-100% object-contain h-140 rounded-1" alt="">
+                    </div>
                     <div v-else class="max-h-140 flex items-center justify-center">
                         <Progress v-if="taskStore.tasks.gen_role" type="circle" :percent="taskStore.tasks.gen_role?.percent" :size="200">
                             <template #format>

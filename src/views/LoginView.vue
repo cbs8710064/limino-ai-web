@@ -6,20 +6,26 @@ import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
 import { reg_email } from '../const/regrex';
 import { useMessage } from '../hooks/useMessage';
-import { useUserRequest } from '../api/useUserRequest';
-const { newUser } = useUserRequest()
+import { useUserStore } from '../stores/useUserStore';
+const userStore = useUserStore()
 const { t } = useI18n()
 const message = useMessage()
 const email = ref('')
 const loading = ref(false)
 const handleSubmit = async () => {
+  /**
+   * There are three cases
+   * White list
+   * No applying
+   * Requested,not whitelisted
+   */
   if (!reg_email.test(email.value)) {
     message.warning(t('warnMessage.emailError'))
   } else {
     // TODO fetch
-    const res = await newUser(email.value)
-    if (res?.id) {
-      message.success('注册成功，请留意邮箱')
+    const res = await userStore.loginIn(email.value)
+    if (res.id) {
+      message.success(t('successMessage.loginSuccess'))
     } else {
       message.error('注册失败')
     }
