@@ -1,9 +1,9 @@
 
 <script setup lang='ts'>
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { getSystemInfo } from '../utils/utils';
 type Direction = 'left' | 'right'
-const props = defineProps<{
+defineProps<{
     direction: Direction;
     width: string
 }>()
@@ -49,7 +49,7 @@ onMounted(() => {
 }
 
 .the-telescoping {
-    transition: all ease .3s;
+    transition: all ease .5s;
     background: #fff;
 }
 
@@ -87,7 +87,8 @@ onMounted(() => {
     }
 
     .the-telescoping-box {
-        --at-apply: h-70;
+        --at-apply: max-h-70;
+        height: auto;
     }
 }
 </style>

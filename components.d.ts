@@ -19,6 +19,7 @@ declare module 'vue' {
     TheDropdown: typeof import('./src/components/TheDropdown.vue')['default']
     TheFooter: typeof import('./src/components/TheFooter.vue')['default']
     TheHeader: typeof import('./src/components/TheHeader.vue')['default']
+    TheLoading: typeof import('./src/components/TheLoading.vue')['default']
     TheModal: typeof import('./src/components/TheModal.vue')['default']
     TheNoData: typeof import('./src/components/TheNoData.vue')['default']
     TheSwitch: typeof import('./src/components/TheSwitch.vue')['default']

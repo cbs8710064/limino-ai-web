@@ -63,7 +63,7 @@ const handleChangeMenu = (e: MenuItem) => {
 </script>
 <template>
   <div class="user-score-modal">
-    <TheModal v-model="show" keyboard click-close>
+    <TheModal v-model="show" keyboard click-close has-mask>
       <div>
         <div class="score-modal-header px-4 py-4">
           <div class="flex">

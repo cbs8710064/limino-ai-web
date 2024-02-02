@@ -11,6 +11,10 @@ export type UseRequestReturns = {
   getTasks: (id: number) => Promise<any>
   updateStoryCover: (id: number, prompt: string) => Promise<any>
   getLogs: () => Promise<any>
+  getAllLogs: () => Promise<any>
+  getRolesByStoryId: (id: number) => Promise<any>
+  getScriptsByStoryId: (id: number) => Promise<any>
+  getIndexList: () => Promise<any[]>
 }
 
 export type CreateVideoParams = {

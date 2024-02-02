@@ -38,10 +38,10 @@ const handleAdd = () => {
         <div class="mt-10 flex items-center justify-center lg:mt--10">
           <div @click="handleAdd" class="create-btn">{{ t('home.startBtn') }}</div>
         </div>
-        <div class="m-auto mt-10 max-w-100% min-h-95 bg-white rounded-5 lg:max-w-80vw">
+        <div class="m-auto mt-10 max-w-100% min-h-70 bg-white rounded-3 lg:max-w-80vw lg:rounded-5">
           <div class="home-tabs">
             <TheTabs>
-              <div :title="t('home.yourPieces')" name="1" icon="i-el-torso">
+              <div :title="t('home.community')" name="1" icon="i-tabler-building-community">
                 <TheTabLibrary />
               </div>
             </TheTabs>
@@ -53,7 +53,7 @@ const handleAdd = () => {
     </div>
 
 
-    <TheModal v-model="addModal" className="rounded-4 mt-0" keyboard click-close>
+    <TheModal v-model="addModal" className="rounded-4 mt-0" keyboard click-close has-mask>
       <ThePrePareModal />
     </TheModal>
 
@@ -86,26 +86,6 @@ const handleAdd = () => {
   background: linear-gradient(120deg, #9f54ba 50%, rgb(245, 244, 235) 50%, rgb(245, 244, 235) 100%);
   min-height: 100vh;
 
-  :deep() {
-    .the-modal-component .the-modal {
-      padding: 0;
-      width: 1000px;
-      --at-apply: rounded-2 lg:rounded-4;
-    }
-
-    .the-modal-component .close-btn {
-      top: -40px;
-      right: -40px;
-
-      i {
-        color: #9f54ba;
-      }
-    }
-
-    .the-modal-component .the-modal .the-modal-body {
-      margin-top: 0;
-    }
-  }
 }
 
 .big-desc {

@@ -3,7 +3,8 @@ export default {
     backHome: '回到首页',
     creating: '已加入任务队列制作中...',
     queuing: '排队中',
-    hasQueueNum: '还有{number}位'
+    hasQueueNum: '还有{number}位',
+    submit: '提交'
   },
 
   home: {
@@ -18,6 +19,7 @@ export default {
     chooseStyleTit: '选择绘图样式',
     noContent: '目前没有作品',
     yourPieces: '您的作品',
+    community: '社区',
     pieceIptPlaceholder: '为您的作品命名',
     realistic: '写实',
     anime: '动漫'
@@ -27,7 +29,10 @@ export default {
     title2: '来自文本内容的漫画和动漫视频。',
     brandTit: 'LiminoAI',
     loginToLimino: '登录到Limino',
-    signToGoogle: '使用谷歌账户登录'
+    signToGoogle: '使用谷歌账户登录',
+    inputEmail: '邮箱地址',
+    emailTit: '填写邮箱地址申请加入白名单',
+    loginIn: '登录到 LiminoAI'
   },
   workbench: {
     brandTit: 'limino.ai',
@@ -108,6 +113,7 @@ export default {
       share: '分享',
       setMainVideo: '设为主视频',
       createVideo: '生成视频',
+      recreateVideo: '重新生成视频',
       nextStoryboarding: '下一批分镜',
       creating: '生成中',
       fenjing: '分镜'
@@ -138,7 +144,8 @@ export default {
     enterStoryText: '请输入故事内容',
     hasFejingQueueWorking: '您当前有分镜生成任务正在运行，请稍后再试',
     noFenjing: '该剧本没有分镜数据',
-    chooseMergeVideos: '请选择要合并的视频'
+    chooseMergeVideos: '请选择要合并的视频',
+    emailError: '邮箱地址不符合规则'
   },
   successMessage: {
     createSuccess: '已经提交到任务队列，请耐心等待',

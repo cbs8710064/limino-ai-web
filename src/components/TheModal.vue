@@ -15,7 +15,8 @@ const props = defineProps<{
     description?: string;
     keyboard?: boolean;
     hasClose?: boolean;
-    clickClose?: boolean
+    clickClose?: boolean;
+    hasMask?: boolean
 }>()
 
 const { t } = useI18n()
@@ -73,7 +74,6 @@ const handleConfirm = () => {
 }
 
 const handleMaskClose = () => {
-    console.warn('mask', props.clickClose)
     if (!props.clickClose) {
         return
     }
@@ -85,7 +85,7 @@ const handleMaskClose = () => {
 <template>
     <div class="the-modal-component">
         <Transition name="fade">
-            <div class="mask" v-if="props.modelValue"></div>
+            <div class="mask" v-if="props.modelValue && hasMask"></div>
         </Transition>
         <Transition name="modal">
             <div v-if="props.modelValue" :class="`modal-con ${className}`">
@@ -120,7 +120,7 @@ const handleMaskClose = () => {
 .the-modal {
     box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.03), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.03);
     background: #fff;
-    --at-apply: relative mx-4 h-auto min-h-30 p-4 w-150 rounded-4 lg:m-0 lg:p-6;
+    --at-apply: relative mx-4 h-auto min-h-30 p-4 w-150 rounded-2 lg:m-0 lg:p-6;
 }
 
 .mask {

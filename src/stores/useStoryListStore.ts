@@ -3,6 +3,13 @@ import { defineStore } from 'pinia'
 import { useRequest } from '@/api/useRequest'
 import { useEventBus } from '../hooks/useBus'
 import { downloadVideoPath } from '@/const'
+type TypeIds = {
+  storyIdx: number // selected story idx
+  chatIdx: number // selected chat idx
+  roleIdx: number // selected role idx
+  shotIdx: number // selected shot idx
+}
+// type PageType = 'story' | 'cover' | 'character' | 'paragraph' | 'post'
 const { eventBus } = useEventBus()
 export type StoryChildrenItem = StoryItem | CharacterItem | ArticleItem
 export type StoryItem = {
@@ -49,14 +56,8 @@ export type MergeList = Array<{
   url: string
 }>
 
-type TypeIds = {
-  storyIdx: number // selected story idx
-  chatIdx: number // selected chat idx
-  roleIdx: number // selected role idx
-  shotIdx: number // selected shot idx
-}
 const idsKey = 'ids'
-const { getStories, deleteStory } = useRequest()
+const { getStories, deleteStory, getTasks } = useRequest()
 const newIds = getIds()
 
 localStorage.removeItem(idsKey)
@@ -88,91 +89,114 @@ export const useStoryListStore = defineStore('storyList', () => {
   // 通过接口同步状态数据
   async function getStoryList() {
     const res = await getStories()
+    const tasks = await getTasks(4)
+    const genvideoTasks = tasks.filter(
+      (it: { func: string; status: number }) => it.status !== 4 && it.func === 'gen_video'
+    )
     if (res && res.length) {
       const { chatIdx, roleIdx, shotIdx } = ids
-      res.forEach((item: { language: any; roles: any; description: any; selected: boolean }) => {
-        // item.selected = false
-        if (item.roles && item.roles.roles && item.roles.roles.length) {
-          item.roles.roles.forEach(
-            (
-              role: {
-                name_en: any
-                name: any
-                text: any
-                selected: boolean
-              },
-              idx: number
-            ) => {
-              const nowRoleIdx = roleIdx > -1 ? roleIdx : 0
-              if (idx === nowRoleIdx) {
-                ids.roleIdx = nowRoleIdx
-                role.selected = true
-              } else {
-                role.selected = false
+      res.forEach(
+        (item: {
+          id: any
+          main_video: any
+          language: any
+          roles: any
+          description: any
+          selected: boolean
+        }) => {
+          // item.selected = false
+          if (item?.roles && item.roles?.roles && item.roles.roles?.length) {
+            item.roles.roles.forEach(
+              (
+                role: {
+                  name_en: any
+                  name: any
+                  text: any
+                  selected: boolean
+                },
+                idx: number
+              ) => {
+                const nowRoleIdx = roleIdx > -1 ? roleIdx : 0
+                if (idx === nowRoleIdx) {
+                  ids.roleIdx = nowRoleIdx
+                  role.selected = true
+                } else {
+                  role.selected = false
+                }
               }
-            }
-          )
-        }
-        if (item.description && item.description.chat_process.length) {
-          const nowChatIdx = chatIdx > -1 ? chatIdx : 0
-          item.description.chat_process.forEach(
-            (
-              child: {
-                text: any
-                text_en: any
-                totalVideos: any
-                process: any
-                videos: any
-                shots: any[]
-                selected: boolean
-              },
-              idx: number
-            ) => {
-              // console.warn('nowShotIdx---', ids)
-              child.text = child.text_en || child.text
-              // 处理故事选中数据
-              if (idx === nowChatIdx) {
-                child.selected = true
-                // 处理分镜
-                if (child.shots && child.shots.length) {
-                  const shotList = [...child.shots]
-                  const nowShotIdx = shotIdx > -1 ? shotIdx : 0
-                  child.shots = shotList.map((url, idx) => {
-                    if (idx === nowShotIdx) {
-                      return {
-                        url,
-                        idx,
-                        selected: true
+            )
+          }
+          if (item.description && item.description.chat_process.length) {
+            const nowChatIdx = chatIdx > -1 ? chatIdx : 0
+            item.description.chat_process.forEach(
+              (
+                child: {
+                  [x: string]: any
+                  main_video: any
+                  text: any
+                  text_en: any
+                  totalVideos: any
+                  process: any
+                  videos: any
+                  shots: any[]
+                  selected: boolean
+                },
+                idx: number
+              ) => {
+                child.text = child.text_en || child.text
+
+                // 处理故事选中数据
+                if (idx === nowChatIdx) {
+                  child.selected = true
+                  // 处理分镜
+                  if (child.shots && child.shots.length) {
+                    const shotList = [...child.shots]
+                    const nowShotIdx = shotIdx > -1 ? shotIdx : 0
+                    child.shots = shotList.map((url, idx) => {
+                      if (idx === nowShotIdx) {
+                        return {
+                          url,
+                          idx,
+                          selected: true
+                        }
+                      } else {
+                        return {
+                          url,
+                          idx,
+                          selected: false
+                        }
                       }
-                    } else {
-                      return {
-                        url,
-                        idx,
-                        selected: false
-                      }
+                    })
+                  }
+                } else {
+                  child.selected = false
+                }
+
+                if (child?.videos && child.videos.length) {
+                  const [v] = child.videos
+                  v.chatIdx = idx
+                  child.main_video = v.url
+                  child.process = 3
+                  child.status = 3
+                  child.totalVideos = 1
+                } else {
+                  genvideoTasks.forEach((c: any) => {
+                    const { args, status, percent } = c
+                    const [id, chatIdx] = args
+
+                    if (item.id === id && chatIdx === idx) {
+                      child.status = status
+                      child.process = status
+                      child.chatIdx = chatIdx
                     }
                   })
+                  child.totalVideos = child.videos.length
                 }
-              } else {
-                child.selected = false
               }
-              if (child?.videos && child.videos.length) {
-                child.videos.forEach((c: any) => {
-                  c.chatIdx = idx
-                })
-                const sortList = child.videos.sort((a: any, b: any) => {
-                  return Math.floor(a.start_time) > Math.floor(b.start_time)
-                })
-                const status = sortList[sortList.length - 1].status
-                child.process = status || 3
-                child.totalVideos = child.videos.length
-              } else {
-                child.totalVideos = 0
-              }
-            }
-          )
+            )
+          }
         }
-      })
+      )
       if (res && res.length) {
         const storyId = list.value.findIndex((it) => it.selected)
         if (storyId && storyId > -1) {
@@ -241,7 +265,7 @@ export const useStoryListStore = defineStore('storyList', () => {
     ids.roleIdx = roleIdx || 0
     list.value.forEach((item) => {
       if (item.id === storyId) {
-        if (item.roles && item.roles.roles && item.roles.roles.length) {
+        if (item?.roles && item.roles?.roles && item.roles.roles?.length) {
           item.roles.roles.forEach((child: { selected: boolean }, idx: number) => {
             if (idx === roleIdx) {
               child.selected = true
@@ -258,7 +282,7 @@ export const useStoryListStore = defineStore('storyList', () => {
     let role: any = {}
     list.value.forEach((item) => {
       if (item.selected) {
-        if (item.roles.roles) {
+        if (item?.roles?.roles) {
           item.roles.roles.find((child: { selected: boolean }) => {
             if (child.selected) {
               role = child
@@ -275,7 +299,7 @@ export const useStoryListStore = defineStore('storyList', () => {
       const val = list.value.find((item) => item.selected)
       let idx = -1
       let chatIdx = -1
-      if (val && val.roles.roles && val.roles.roles.length) {
+      if (val && val.roles?.roles && val.roles.roles?.length) {
         idx = val.roles.roles.findIndex((child) => child.selected)
       }
       if (
@@ -362,7 +386,6 @@ export const useStoryListStore = defineStore('storyList', () => {
     return []
   }
 
-  getStoryList()
   return {
     list,
     selectedStory,

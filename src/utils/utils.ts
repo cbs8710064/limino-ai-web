@@ -2,8 +2,10 @@ import i18n from '@/languages'
 import type { MergeList } from '@/stores/useStoryListStore'
 import type { SystemInfo, SystemName } from '@/types/utils'
 import { message } from 'ant-design-vue'
-import { FFmpeg } from '@/assets/js/ffmpeg/ffmpeg/index'
-import { fetchFile, toBlobURL } from '@/assets/js/ffmpeg/utils/index'
+import {FFmpeg} from '@ffmpeg/ffmpeg'
+import { fetchFile, toBlobURL } from '@ffmpeg/util'
+// import { FFmpeg } from '@/assets/js/ffmpeg/ffmpeg/index'
+// import { fetchFile, toBlobURL } from '@/assets/js/ffmpeg/utils/index'
 export function debounce(fn: Function, wait: number = 500) {
   let timeout: number | null = null
   return function () {
@@ -97,12 +99,17 @@ export const mergerVideo = async (list: MergeList) => {
     console.log(e)
   })
   if (!ffmpeg.loaded) {
-    const c = message.loading(i18n.global.t('loadingMessage.loadFFmpeg'), 0)
-    await ffmpeg.load({
-      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm')
-    })
-    c()
+    try {
+      const c = message.loading(i18n.global.t('loadingMessage.loadFFmpeg'), 0)
+      await ffmpeg.load({
+        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm')
+      })
+      c()
+    } catch (err) {
+      console.error(err)
+      message.error(i18n.global.t('errorMessage.loadFailed'))
+    }
   }
   const e = message.loading(i18n.global.t('loadingMessage.mergeVideoing'), 0)
   let concatStr = 'concat:'
@@ -145,3 +152,232 @@ export const mergerVideo = async (list: MergeList) => {
   e()
   return Promise.resolve()
 }
+
+// export const mergerVideo = async (list: MergeList) => {
+//   const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm'
+//   const ffmpeg = new FFmpeg()
+//   ffmpeg.on('log', (e) => {
+//     console.log(e)
+//   })
+//   if (!ffmpeg.loaded) {
+//     const c = message.loading(i18n.global.t('loadingMessage.loadFFmpeg'), 0)
+//     await ffmpeg.load({
+//       coreURL:  await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+//       wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm')
+//     })
+//     c()
+//   }
+//   const e = message.loading(i18n.global.t('loadingMessage.mergeVideoing'), 0)
+//   const newList = []
+//   for await (const item of list) {
+//     const i = item.idx
+//     const url = item.url
+//     const name = `video${i}`
+//     const mp4Name = name + '.mp4'
+//     await ffmpeg.writeFile(mp4Name, await fetchFile(url))
+
+//     //TODO 判断有没有音频 生成空白音轨插入该视频
+//     const err = await ffmpeg.exec(['-i', mp4Name, '-vn', '-f', 'null', '-'])
+//     if (err) {
+//       try {
+//         // 没有音频，添加空音轨
+//         const res = await ffmpeg.exec([
+//           '-i',
+//           mp4Name,
+//           '-f',
+//           'lavfi',
+//           '-i',
+//           'anullsrc',
+//           '-c:v',
+//           'copy',
+//           '-shortest',
+//           '-map',
+//           '0:v',
+//           '-map',
+//           '1:a',
+//           '-y',
+//           'blank_' + mp4Name
+//         ])
+//         console.warn('out blank video', res)
+//         newList.push('blank_' + mp4Name)
+//       } catch (err) {
+//         console.error('read', err)
+//       }
+//     } else {
+//       newList.push(mp4Name)
+//     }
+
+//     // concat协议 适合视频MPEG格式，其他格式文件，先转码再合并
+//     // await ffmpeg.exec([
+//     //   '-i',
+//     //   name + '.mp4',
+//     //   '-c',
+//     //   'copy',
+//     //   '-bsf:v',
+//     //   'h264_mp4toannexb',
+//     //   '-f',
+//     //   'mpegts',
+//     //   name + '.ts'
+//     // ])
+//   }
+//   const arr: string[] = []
+//   let str = ''
+//   newList.forEach((path, idx) => {
+//     arr.push('-i')
+//     arr.push(path)
+
+//     str += `[${idx}:v:0][${idx}:a:0]`
+//   })
+//   console.log('newList', newList)
+//   str += `concat=n=${newList.length}:v=1:a=1[outv][outa]`
+//   console.warn('-----------------------------', str)
+//   console.warn('-----------------------------', arr)
+//   const par = [...arr, '-filter_complex', str, '-map', '[outv]', '-map', '[outa]', 'out.mp4']
+//   console.warn('par', par)
+//   // for await (const item of newList) {
+//   //   console.warn('url', item)
+//   //   const re = await ffmpeg.readFile(item)
+//   //   console.warn('decode', re)
+//   //   const url = URL.createObjectURL(
+//   //     new Blob([(re as unknown as Uint8Array).buffer], { type: 'video/mp4' })
+//   //   )
+//   //   download(url, 'merge_video.mp4')
+//   // }
+
+//   try {
+//     const res = await ffmpeg.exec(par, 2000)
+//     console.warn('-merge-----------', res)
+//   } catch (err) {
+//     console.error(err)
+//   }
+//   const data = await ffmpeg.readFile('out.mp4')
+//   const url = URL.createObjectURL(
+//     new Blob([(data as unknown as Uint8Array).buffer], { type: 'video/mp4' })
+//   )
+//   download(url, 'merge_video.mp4')
+//   e()
+//   return Promise.resolve()
+// }
+
+// export const mergerVideo = async (list: MergeList) => {
+//   // @ts-ignore
+
+//   const ffmpeg = createFFmpeg({
+//     log: true
+//     // corePath: '/public/ffmpeg-core.js'
+//   })
+//   if (!ffmpeg.isLoaded()) {
+//     try {
+//       const c = message.loading(i18n.global.t('loadingMessage.loadFFmpeg'))
+//       await ffmpeg.load()
+//       c()
+//     } catch (err) {
+//       message.error(i18n.global.t('errorMessage.loadFailed'))
+//     }
+//   }
+
+//   const e = message.loading(i18n.global.t('loadingMessage.mergeVideoing'), 0)
+//   const newList = []
+//   for await (const item of list) {
+//     const i = item.idx
+//     const url = item.url
+//     const name = `video${i}`
+//     const mp4Name = name + '.mp4'
+//     ffmpeg.FS('writeFile', mp4Name, await fetchFile(url))
+
+//     //TODO 判断有没有音频 生成空白音轨插入该视频
+//     const err: any = await ffmpeg.run('-i', mp4Name, '-vn', '-acodec', 'copy', '-f', 'null', '/dev/null')
+//     debugger
+//     // const tempRead = ffmpeg.FS('readFile', 'temp.mp4')
+    
+//     if (err) {
+//       try {
+//         // 没有音频，添加空音轨
+//         debugger
+//         const res = await ffmpeg.run(
+//           '-i',
+//           mp4Name,
+//           '-f',
+//           'lavfi',
+//           '-i',
+//           'anullsrc',
+//           '-c:v',
+//           'copy',
+//           '-shortest',
+//           '-map',
+//           '0:v',
+//           '-map',
+//           '1:a',
+//           '-y',
+//           'blank_' + mp4Name
+//         )
+//         console.warn('out blank video', res)
+//         newList.push('blank_' + mp4Name)
+//       } catch (err) {
+//         console.error('read', err)
+//       }
+//     } else {
+//       newList.push(mp4Name)
+//     }
+
+//     // concat协议 适合视频MPEG格式，其他格式文件，先转码再合并
+//     // await ffmpeg.exec([
+//     //   '-i',
+//     //   name + '.mp4',
+//     //   '-c',
+//     //   'copy',
+//     //   '-bsf:v',
+//     //   'h264_mp4toannexb',
+//     //   '-f',
+//     //   'mpegts',
+//     //   name + '.ts'
+//     // ])
+//   }
+
+//   const arr: string[] = []
+//   let str = ''
+//   newList.forEach((path, idx) => {
+//     arr.push('-i')
+//     arr.push(path)
+
+//     str += `[${idx}:v:0][${idx}:a:0]`
+//   })
+//   console.log('newList', newList)
+//   str += `concat=n=${newList.length}:v=1:a=1[outv][outa]`
+//   console.warn('-----------------------------', str)
+//   console.warn('-----------------------------', arr)
+//   const par = [...arr, '-filter_complex', str, '-map', '[outv]', '-map', '[outa]', 'out.mp4']
+//   console.warn('par', par)
+//   // for await (const item of newList) {
+//   //   console.warn('url', item)
+//   //   const re = await ffmpeg.readFile(item)
+//   //   console.warn('decode', re)
+//   //   const url = URL.createObjectURL(
+//   //     new Blob([(re as unknown as Uint8Array).buffer], { type: 'video/mp4' })
+//   //   )
+//   //   download(url, 'merge_video.mp4')
+//   // }
+
+//   try {
+//     const res = await ffmpeg.run(
+//       ...arr,
+//       '-filter_complex',
+//       str,
+//       '-map',
+//       '[outv]',
+//       '-map',
+//       '[outa]',
+//       'out.mp4'
+//     )
+//     console.warn('-merge-----------', res)
+//   } catch (err) {
+//     console.error('merge failed', err)
+//   }
+//   const data = ffmpeg.FS('readFile', 'out.mp4')
+//   const url = URL.createObjectURL(
+//     new Blob([(data as unknown as Uint8Array).buffer], { type: 'video/mp4' })
+//   )
+//   download(url, 'merge_video.mp4')
+//   e()
+//   return Promise.resolve()
+// }

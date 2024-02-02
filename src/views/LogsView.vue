@@ -7,14 +7,14 @@ import { useRouter } from 'vue-router';
 import { useMessage } from '../hooks/useMessage';
 const message = useMessage()
 const activeKey = ref(0)
-const { getLogs } = useRequest()
+const { getLogs, getAllLogs } = useRequest()
 const loading = ref(false)
 const logs = ref()
 const router = useRouter()
 onMounted(async () => {
     try {
         loading.value = true
-        const arr = await getLogs()
+        const arr = await getAllLogs()
         // logs.value = JSON.stringify(arr, null, 4)
         logs.value = arr
     } finally {

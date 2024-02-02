@@ -40,13 +40,14 @@ const handleSelect = (e: StoryItem) => {
     storyListStore.setStorySelected(e.id)
 }
 
-const confirmDelete = async () => {
+const confirmDelete = async (close: Function) => {
     if (storyListStore && storyListStore.selectedStory && storyListStore.selectedStory.id) {
         const res = await storyListStore.delStory(storyListStore?.selectedStory?.id)
         if (res) {
             message.success(t('successMessage.deleteVideoSuccess'))
-            storyListStore.getStoryList()
+            await storyListStore.getStoryList()
         }
+        close()
     }
 }
 
@@ -63,44 +64,41 @@ onUnmounted(() => {
 </script>
 <template>
     <div>
-        <div class="scrollbar-small-x lg:scrollbar-small-y story-list px-4 pt-4 lg:px-4" v-if="storyListStore.list.length">
+        <div class="scrollbar-small-x lg:scrollbar-small-y story-list px-4 pt-4 lg:pl-4 lg:pr-3" v-if="storyListStore.list.length">
             <div :class="`post-item ${item.selected ? 'active' : ''}`" v-for="item in storyListStore.list" :key="item.id" @click.stop="handleChooseStory(item)">
-                <div class="absolute top-0 z-1000 mb-1 flex items-center justify-between right-0">
+                <div class="absolute top-0 z-1 mb-1 flex items-center justify-between right-0">
                     <div class="flex cursor-pointer items-center font-size-5" v-if="hasBtns">
                         <i class="i-material-symbols-delete color-#666" @click.stop="handleDelete(item)"></i>
                     </div>
                 </div>
                 <div class="story-img flex items-center justify-center h-24 lg:h-36.1">
                     <div class="flex justify-center">
-                        <div v-if="taskStore.tasks.init_story && item.id === taskStore.tasks.init_story.storyId" class="w-100% overflow-hidden bg-white p-2 rounded-1">
-                            <Progress type="circle" :percent="taskStore.tasks.init_story.percent" :size="70">
+                        <div v-if="taskStore.tasks.init_story && item.id === taskStore.tasks.init_story.storyId" class="w-100% overflow-hidden p-2 rounded-1">
+                            <Progress type="circle" :percent="taskStore.tasks.init_story.percent" :size="80">
                                 <template #format>
                                     <div>
-                                        <div class="font-size-4 color-#9f54ba" v-if="taskStore.tasks.init_story.status === 1">
-                                            <div class="text-center">{{ t('common.queuing') }}</div>
-                                            <div class="text-center">{{ t("common.hasQueueNum", { number: taskStore.tasks.init_story.queue }) }}</div>
+                                        <div class="font-size-3.2 color-white lg:font-size-4" v-if="taskStore.tasks.init_story.status === 1">
+                                            <div class="mb-2 text-center font-size-4 font-bold">0%</div>
+                                            <div class="flex items-center justify-center">
+                                                <i class="i-fluent-people-queue-24-filled font-size-5"></i>
+                                                <span class="font-size-4 font-bold">{{ taskStore.tasks.init_story.queue }}</span>
+                                            </div>
                                         </div>
-                                        <div v-else class="text-center">{{ taskStore.tasks.init_story.percent }}%</div>
-
+                                        <div v-else class="text-center color-white">{{ taskStore.tasks.init_story.percent }}%</div>
                                     </div>
                                 </template>
                             </Progress>
                         </div>
-                        <div v-else class="p-2 w-25 h-25 lg:p-4 lg:w-35 lg:h-35">
+                        <div v-else class="flex items-center justify-center p-2 w-25 h-25 lg:p-4 lg:w-35 lg:h-35">
                             <Image loading="lazy" v-if="item?.cover" :src="`${videoPath}/${item.cover}`" :preview="false" class="h-100% w-90% object-contain rounded-1" />
-                            <i v-else class="i-svg-spinners-ring-resize mr-2 font-size-10"></i>
+                            <i v-else class="i-svg-spinners-ring-resize mr-2 font-size-10 color-#fff"></i>
                         </div>
                     </div>
-
-
                 </div>
-                <div class="text-ellipsis whitespace-nowrap px-1 text-center font-size-3 font-bold lh-7 lg:font-size-3.5">{{ item.name }}</div>
+                <div class="overflow-hidden text-ellipsis whitespace-nowrap px-1 text-center font-size-3 font-bold lh-7 lg:px-0 lg:font-size-3.5">{{ item.name }}</div>
             </div>
         </div>
-        <div v-else class="scrollbar-small-y story-list2 px-2 pt-4 font-size-4 color-#ccc lg:px-4 lg:text-left">
-            {{ t('home.noContent') }}
-        </div>
-        <TheModal v-model="deleteModal" @confirm="confirmDelete" keyboard has-footer>
+        <TheModal v-model="deleteModal" @confirm="confirmDelete" keyboard has-footer has-mask loading>
             <div>
                 <div class="flex items-center justify-center">
                     <i class="i-ph-warning-circle-bold font-size-10 color-orange lg:font-size-16"></i>
@@ -122,19 +120,19 @@ onUnmounted(() => {
 
 
 .story-list {
-    height: calc(100vh - 3.1rem);
-    --at-apply: pt-4 lg-100% lg:w-47.5 flex flex-col overflow-x-scroll overflow-y-hidden lg:overflow-y-scroll lg:overflow-x-hidden;
-    border-right: 1px solid #eee;
+    max-height: calc(100vh - 3.1rem);
+    --at-apply: pb-2 lg-100% lg:w-47.5 flex flex-col overflow-x-scroll overflow-y-hidden lg:overflow-y-scroll lg:overflow-x-hidden;
+    /* border-right: 1px solid #eee; */
 }
 
 .story-list2 {
-    height: calc(100vh - 3.1rem);
-    --at-apply: pt-4 lg-100% lg:w-47.5 flex justify-center items-center lg:flex-col lg:justify-start lg:items-start;
-    border-right: 1px solid #eee;
+    max-height: calc(100vh - 3.1rem);
+    --at-apply: pb-2 lg-100% lg:w-47.5 flex justify-center items-center lg:flex-col lg:justify-start lg:items-start;
+    /* border-right: 1px solid #eee; */
 }
 
 .post-item {
-    --at-apply: font-bold rounded-1.2 lg:rounded-2 mb-2 h-32 lg:h-45 w-100% lg:w-40 lg:block lg:px-1 lg:py-1 cursor-pointer relative;
+    --at-apply: font-bold rounded-1.2 lg:rounded-2 mb-2 h-32 lg:h-45 w-100% lg:block lg:px-1 lg:py-1 cursor-pointer relative;
     border: 2px solid #eee;
 
     &.active {
@@ -181,7 +179,7 @@ onUnmounted(() => {
     }
 
     .story-list2 {
-        --at-apply: h-30;
+        --at-apply: max-h-30;
     }
 }
 </style>

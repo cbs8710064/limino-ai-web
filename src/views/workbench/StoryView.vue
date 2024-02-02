@@ -23,6 +23,10 @@ const createStore = useCreateStore()
 const storyListStore = useStoryListStore()
 
 const handleAdd = async () => {
+    const Form = document.getElementById('Form')
+    if (Form) {
+        Form.scrollIntoView({ behavior: 'smooth' })
+    }
     storyStep.value = 1
     newStoryVal.value.name = ''
     newStoryVal.value.text = ''
@@ -96,6 +100,8 @@ const handleStoryChange = (e: StoryItem) => {
 }
 
 onMounted(() => {
+    storyListStore.getStoryList()
+
     eventBus.on('headerNextEvent', () => {
         const flag = checkStoryData()
         if (flag) {
@@ -130,9 +136,10 @@ const handleAddConfirm = async () => {
         await storyListStore.getStoryList()
         if (!res?.task?.error && res.id) {
             eventBus.emit('addStoryEvent', res.id)
-            router.push({
-                name: 'cover'
-            })
+            // router.push({
+            //     name: 'cover'
+            // })
+            message.success(t('successMessage.createSuccess'))
         } else {
             message.error(t('errorMessage.createStoryFailed'))
         }
@@ -169,17 +176,15 @@ onUnmounted(() => {
             </div>
         </TheTelescoping>
 
-        <div class="story-right scrollbar-small-y my-4 w-100% flex-grow-1 bg-white px-4 pb-2 rounded-2 lg:m-6 lg:px-4 lg:pb-0">
-            <!-- <div class="py-1 font-size-4 font-bold lg:py-3 lg:font-size-5">{{ t('workbench.views.story.tellAStory') }}</div>
-            <div class="font-size-3 color-gray lg:font-size-3.3">{{ t('workbench.views.story.iptContent') }}</div> -->
+        <div class="story-right scrollbar-small-y my-4 w-100% flex-grow-1 bg-white px-4 pb-2 rounded-2 lg:m-6 lg:px-4 lg:pb-0" id="Form">
             <div class="mt-2 lg:mt-4">
                 <div name="1" icon="i-bi-pencil-fill">
-                    <div class="mb-10" v-if="(storyStep === 1 || storyStep === 2) && !storyListStore.selectedStory">
+                    <div class="mb-2" v-if="(storyStep === 1 || storyStep === 2) && !storyListStore.selectedStory">
                         <div v-if="storyStep === 1">
                             <div class="mt-4 lg:flex">
                                 <div class="w-100% lg:w-60">
                                     <div class="font-size-4 font-bold">{{ t('home.pieceTit') }}</div>
-                                    <input maxlength="64" type="text" v-focus v-model="newStoryVal.name" class="mt-2 w-100%" :placeholder="t('home.pieceIptPlaceholder')">
+                                    <input maxlength="64" type="text" v-model="newStoryVal.name" class="mt-2 w-100%" :placeholder="t('home.pieceIptPlaceholder')">
                                 </div>
                             </div>
                             <div class="lh:lh-10 mb-2 mt-2 flex font-size-4 font-bold lh-8 lg:mt-4">
@@ -193,25 +198,24 @@ onUnmounted(() => {
                             </div>
                         </div>
                     </div>
-                    <div class="mb-4 lg:mb-10" v-else>
+                    <div class="mb-2 lg:mb-6" v-else>
                         <div class="lh:lh-10 mt-2 flex font-bold lh-8 lg:mt-4">
                             {{ t('workbench.views.story.storyText') }}
                         </div>
                         <textarea readonly class="scrollbar-small-y h-35vh w-100% resize-none lg:h-42vh" v-model="newStoryVal.text" :placeholder="t('workbench.views.story.enterAstory')" name="" id="" cols="30"></textarea>
                     </div>
-                    <div class="mt-2 font-size-3 lg:mb-0 lg:mb-10 lg:mt-5 lg:font-size-4">{{ t('workbench.views.story.tip') }}</div>
+                    <div class="font-size-3 lg:mb-0 lg:font-size-4">{{ t('workbench.views.story.tip') }}</div>
                 </div>
             </div>
         </div>
         <TheTelescoping direction="left" width="350px" class="right-box">
-            <div class="pl-4 pt-4">
-                <div class="mt-5 font-size-4 font-bold">{{ t('home.chooseStyleTit') }}</div>
-                <div class="scrollbar-small-y choose-list mt-4 flex flex-wrap lg:max-h-50vh">
+            <div>
+                <div class="mt-4 px-4 font-size-4 font-bold">{{ t('home.chooseStyleTit') }}</div>
+                <div class="scrollbar-small-y choose-list flex flex-wrap justify-evenly lg:max-h-50vh">
                     <div v-for="item in list" :key="item.id" @click="handleChoose(item)" :class="`style-card ${item.checked ? 'activite' : ''}`">
-                        <img :src="item.url" class="h-100% w-100% object-cover" alt="">
-                        <i v-if="item.checked" class="i-icon-park-solid-success absolute top-2 font-size-8 color-#9f54ba right-2"></i>
-                        <div class="style-card-bottom-bg absolute bottom-0 left-0 flex flex-col justify-end text-center color-white right-0 h-20">
-                            <div class="font-size-4 font-bold">{{ item.desc }}</div>
+                        <i v-if="item.checked" class="i-icon-park-solid-success absolute top-0 font-size-5 color-#9f54ba right-2"></i>
+                        <div class="style-card-bottom-bg absolute bottom-0 left-0 flex flex-col justify-end text-center color-black right-0 h-20">
+                            <div class="font-size-4 font-bold lh-10">{{ item.desc }}</div>
                         </div>
                     </div>
                 </div>
@@ -227,13 +231,14 @@ onUnmounted(() => {
 :deep() {
 
     .story-list {
-        height: calc(100vh - 7.7rem);
+        max-height: calc(100vh - 7.7rem);
         border-right: 0;
     }
 }
 
 .story-left {
     height: calc(100vh - 3.5rem);
+    --at-apply: pb-4;
 }
 
 .story-right {
@@ -242,8 +247,8 @@ onUnmounted(() => {
 
 .style-card {
     transition: ease .3s;
-    border: 2px solid transparent;
-    --at-apply: cursor-pointer w-48% h-46 lg:w-37.7 lg:h-37.7 mb-5 rounded-2 mr-2 lg:mr-4 overflow-hidden relative;
+    border: 2px solid #ccc;
+    --at-apply: cursor-pointer w-44% h-10 lg:w-35 lg:h-10 my-4 rounded-2 overflow-hidden relative;
 
     &.activite {
         border: 2px solid #9f54ba;
@@ -252,12 +257,9 @@ onUnmounted(() => {
     }
 
     .style-card-bottom-bg {
-        background: linear-gradient(180deg, rgba(243, 176, 22, 0) 20%, rgba(0, 0, 0, .8) 100%);
+        /* background: linear-gradient(180deg, rgba(243, 176, 22, 0) 20%, rgba(0, 0, 0, .8) 100%); */
     }
 
-    &:nth-of-type(2n+0) {
-        margin-right: 0;
-    }
 }
 
 @media screen and (max-width: 1024px) {
@@ -277,7 +279,7 @@ onUnmounted(() => {
 
     :deep() {
         .left-box .the-telescoping-box {
-            --at-apply: h-50;
+            --at-apply: max-h-50;
 
             .h-100vh {
                 height: 100%;
@@ -285,13 +287,11 @@ onUnmounted(() => {
         }
 
         .right-box .the-telescoping-box {
-            --at-apply: min-h-80 h-auto;
-
-            .choose-list {}
+            --at-apply: min-h-40 h-auto;
         }
 
         .story-list {
-            --at-apply: flex h-40 flex-row w-100%;
+            --at-apply: flex max-h-40 flex-row w-100%;
 
             .post-item {
                 --at-apply: min-w-28 mr-2 max-w-28;

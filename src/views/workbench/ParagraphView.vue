@@ -22,6 +22,7 @@ const taskStore = useTaskStore()
 const { eventBus } = useEventBus()
 const router = useRouter()
 const storyListStore = useStoryListStore()
+
 const { createVideo, nextFenjing, getTasks } = useRequest()
 const currentVideo = ref({
   url: '',
@@ -31,6 +32,7 @@ const currentVideo = ref({
 
 onMounted(async () => {
   createStore.setStep(4)
+  storyListStore.getStoryList()
   eventBus.on('headerNextEvent', (): void => {
     router.push({ name: 'post' })
   })
@@ -66,7 +68,6 @@ const handleChangeStory = (e: StoryItem) => {
 
 }
 
-
 const handleSelect = (_e: any, idx: number) => {
   if (!_e.main_video || _e.main_video !== currentVideo.value.main_video) {
     createVideoLoading.value = true
@@ -81,7 +82,6 @@ const handleSelect = (_e: any, idx: number) => {
     })
   }
 }
-
 
 const createVideoLoading = ref(false)
 const handleSelectShot = (_e: any, idx: number) => {
@@ -171,26 +171,6 @@ async function getFenjingTask() {
   }
   return []
 }
-// 轮训分镜任务
-let loopT: any
-const loopHasFenjingTask = async () => {
-  if (loopT) {
-    return
-  }
-  const storyId = storyListStore?.selectedStory?.id
-  return new Promise((resolve) => {
-    if (storyId) {
-      loopT = setInterval(async () => {
-        const res = await getFenjingTask()
-        if (!res.length) {
-          resolve(false)
-          clearInterval(loopT)
-        }
-      }, 4000)
-    }
-  })
-
-}
 
 const handleGetFenJing = async () => {
   if (loadingFenJing.value) {
@@ -207,8 +187,8 @@ const handleGetFenJing = async () => {
       }
     }
     await nextFenjing(Number(id), chatIdx)
-    await loopHasFenjingTask()
-    location.reload()
+    await taskStore.loopTasks(2, 'gen_shots')
+
   }
 }
 
@@ -217,10 +197,10 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
 <template>
   <div class="paragraph-page lg:flex">
     <TheTelescoping width="380px" direction="right" class="ipt-box">
-      <div class="lg:flex">
+      <div class="pb-4 lg:flex">
         <StoryList @change="handleChangeStory" />
-        <div class="max-h-35 w-100% lg:max-h-93.2vh">
-          <div class="scrollbar-small-x lg:scrollbar-small-y panel-list max-h-35 px-4 lg:max-h-84vh lg:px-4" v-if="storyListStore.selectedStory?.description?.chat_process && storyListStore.selectedStory?.description?.chat_process.length">
+        <div class="max-h-37 w-100% lg:max-h-93.2vh">
+          <div class="scrollbar-small-x lg:scrollbar-small-y panel-list max-h-35 px-4 lg:max-h-84vh lg:pl-4 lg:pr-3" v-if="storyListStore.selectedStory?.description?.chat_process && storyListStore.selectedStory?.description?.chat_process.length">
             <div v-for="(item, idx) in storyListStore.selectedStory?.description?.chat_process" :key="item.id" @click="handleSelect(item, idx)" :class="`panel-item ${item.selected ? 'active' : ''}`">
               <div class="flex items-center justify-center h-4" v-if="item.process">
                 <div class="h-4" v-if="item.process === 1 || item.process === 2" :title="t('common.creating')">
@@ -236,16 +216,16 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
               </div>
             </div>
           </div>
-          <div v-else class="mt-4 w-100% px-4 text-center font-size-4 color-#ccc h-30 lg:h-100%">
+          <div v-else class="mt-4 max-h-30 w-100% px-4 text-center font-size-4 color-#ccc lg:h-100%">
             {{ t('home.noContent') }}
           </div>
         </div>
       </div>
 
     </TheTelescoping>
-    <div class="con scrollbar-small-y min-h-40vh w-100% px-4 lg:h-93.3vh lg:min-h-50vh lg:px-10">
+    <div class="con scrollbar-small-y min-h-60 w-100% px-4 lg:h-93.3vh lg:min-h-50vh lg:px-10">
       <div class="h-100% flex items-center items-center justify-center py-4 lg:py-10">
-        <div class="relative max-w-240 min-h-80 w-100% bg-white p-4 rounded-1 lg:min-h-140">
+        <div class="relative max-w-240 min-h-60 w-100% bg-white p-4 rounded-1 lg:min-h-140">
           <div class="h-100% w-100% flex items-center justify-center" v-if="createVideoLoading">
             <i class="i-svg-spinners-ring-resize font-size-16"></i>
           </div>
@@ -266,22 +246,24 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
               <div class="mt-4 text-center color-#ccc">{{ t('workbench.components.noVideo') }}</div>
             </div>
             <div v-else>
-              <Progress type="circle" :percent="taskStore.tasks.gen_video.percent">
+              <Progress type="circle" :percent="taskStore.tasks.gen_video.percent" :size="200">
                 <template #format>
                   <div>
                     <div class="font-size-4 color-#9f54ba" v-if="taskStore.tasks.gen_video.status === 1">
-                      <div class="text-center">{{ t('common.queuing') }}</div>
-                      <div class="text-center">{{ t("common.hasQueueNum", { number: taskStore.tasks.gen_video.queue }) }}</div>
+                      <div class="mb-2 text-center font-size-7 font-bold">0%</div>
+                      <div class="flex items-center justify-center">
+                        <i class="i-fluent-people-queue-24-filled font-size-7"></i>
+                        <span class="font-size-5 font-bold">{{ taskStore.tasks.gen_video.queue }}</span>
+                      </div>
                     </div>
-                    <div v-else class="text-center">{{ taskStore.tasks.gen_video.percent }}%</div>
-
+                    <div v-else class="text-center font-size-7 font-bold">{{ taskStore.tasks.gen_video.percent }}%</div>
                   </div>
                 </template>
               </Progress>
             </div>
           </div>
-          <div class="mt-4 flex items-center justify-center" v-if="storyListStore.selectedChat?.text">
-            <TheButton type="border" class-name="font-size-3 mr-4" @click="handleCreate" :loading="createVideoLoading">{{ t('workbench.views.createVideo') }}</TheButton>
+          <div class="mt-4 flex items-center justify-center" v-if="!taskStore.hasVideoTask && storyListStore.selectedChat?.text">
+            <TheButton type="border" class-name="font-size-3 mr-4" @click="handleCreate" :loading="createVideoLoading">{{ currentVideo.main_video ? t('workbench.views.recreateVideo') : t('workbench.views.createVideo') }}</TheButton>
           </div>
         </div>
       </div>
@@ -299,7 +281,7 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
                     <i class="i-material-symbols-check-circle-rounded font-size-6 color-white"></i>
                   </div>
                 </div>
-                <Image loading="lazy" object="cover" class="z--1 rounded-1" height="5.94rem" width="100%" :src="`${videoPath}/${item.url}`"></Image>
+                <Image loading="lazy" object="cover" class="z--1 rounded-1" width="100%" :src="`${videoPath}/${item.url}`"></Image>
 
               </div>
             </div>
@@ -339,11 +321,12 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
 .panel-list {
   max-height: calc(100vh - 3.6rem);
   --at-apply: w-100% lg:w-47.5 flex lg:block;
+  border-left: 1px solid #eee;
 }
 
 .panel-item {
   border: 2px solid #ccc;
-  --at-apply: w-35 lg:w-100% mt-2 mr-2 lg:mr-0 lg:mt-4 mb-2 rounded cursor-pointer bg-gray-500/5 px-2 pb-2 min-h-28 relative;
+  --at-apply: w-35 lg:w-100% mt-4 mr-2 lg:mr-0 lg:mt-4 mb-2 rounded cursor-pointer bg-gray-500/5 px-2 pb-2 min-h-28 relative;
 
   &.active {
     border-color: #9f54ba;
@@ -354,7 +337,13 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
 
 .storyboarding {
   border: 2px solid #eee;
-  --at-apply: h-25 w-49% mb-2 cursor-pointer rounded-2 relative;
+  --at-apply: h-40 lg:h-25 w-49% mb-2 cursor-pointer rounded-2 relative;
+
+  :deep() {
+    .ant-image img {
+      height: 5.97rem;
+    }
+  }
 
   &.active {
     border-color: #9f54ba;
@@ -372,9 +361,20 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
 
 
 @media screen and (max-width: 1024px) {
+  .panel-list {
+    border-left: none;
+    border-top: 1px solid #eee;
+  }
+
   :deep() {
+    .storyboarding {
+      .ant-image img {
+        height: 9.7rem;
+      }
+    }
+
     .ipt-box .the-telescoping-box {
-      --at-apply: h-79;
+      --at-apply: max-h-85;
 
       .h-100vh {
         height: 100%;
@@ -382,7 +382,7 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
     }
 
     .right-box .the-telescoping-box {
-      --at-apply: min-h-60 max-h-155 h-auto pb-5;
+      --at-apply: min-h-60 max-h-185 h-auto pb-5;
     }
 
     .story-list {

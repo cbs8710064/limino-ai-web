@@ -22,6 +22,14 @@ const mergeLoading = ref(false)
 const handleMergeVideos = async () => {
   mergeLoading.value = true
   const list = getMainVideoList()
+  // const list = [
+  //   { url: 'https://test.limino.ai/assets/video-0-0.mp4', idx: 1 },
+  //   { url: 'https://test.limino.ai/assets/video-1-0.mp4', idx: 2 },
+  //   { url: 'https://test.limino.ai/assets/video-2-0.mp4', idx: 3 },
+  //   { url: 'https://test.limino.ai/assets/video-3-0.mp4', idx: 4 },
+  //   { url: 'https://test.limino.ai/assets/video-4-0.mp4', idx: 5 },
+  //   { url: 'https://test.limino.ai/assets/video-5-0.mp4', idx: 6 },
+  // ]
   if (!list.length) {
     message.error(t('warnMessage.chooseMergeVideos'))
     return
@@ -30,6 +38,7 @@ const handleMergeVideos = async () => {
     await mergerVideo(list)
     message.success(t('successMessage.mergeSuccess'))
   } catch (err) {
+    console.error(err)
     message.error(JSON.stringify(err))
   } finally {
     mergeLoading.value = false
@@ -66,7 +75,7 @@ const handleMergeVideos = async () => {
 
 .con-header {
   border-bottom: 1px solid #eee;
-  --at-apply: flex items-center justify-between px-3 lg:px-6 py-2 h-14;
+  --at-apply: flex items-center justify-between px-4 lg:px-6 py-2 h-14;
 }
 
 .row-line {

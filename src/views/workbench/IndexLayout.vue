@@ -30,7 +30,7 @@ onBeforeRouteUpdate(() => {
 </script>
 <template>
   <div class="w-100% flex flex-col justify-between">
-    <div class="index-layout-left w-100% overflow-y-scroll h-16 lg:h-100vh lg:pr-4 lg:w-30">
+    <div class="index-layout-left w-100% overflow-y-scroll h-18 lg:h-100vh lg:pr-4 lg:w-30">
       <StepNav :step="createStore.step" />
     </div>
     <div class="index-layout-right">

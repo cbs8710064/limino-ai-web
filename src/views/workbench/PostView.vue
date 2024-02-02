@@ -214,58 +214,60 @@ const smallVideoList = computed(() => {
         </TheTelescoping>
 
         <div class="scrollbar-small-y con w-100% lg:h-93.3vh">
-            <div class="min-h-55vh w-100% flex items-start justify-center py-4 lg:mt-10 lg:min-h-140 lg:items-center lg:py-10">
-                <div class="relative mx-4 mt-10 max-w-220 w-100% bg-white p-2 rounded-1 lg:mx-10 lg:mt-0 lg:p-4" draggable>
-                    <div class="absolute left-0 top--10 font-size-4 color-#999 font-bold lg:font-size-5">{{ currentVideo.url }}</div>
-                    <div v-if="currentVideo.url" class="w-100%">
-                        <div class="w-100% flex items-center justify-center" v-if="!currentLoading">
-                            <video class="z-140 h-auto w-100% object-cover rounded-1" controls playsinline>
-                                <source :src="`${videoPath}/${currentVideo.url}`" type="video/mp4">
-                            </video>
-                        </div>
-                        <div v-else class="w-100% flex items-center justify-center h-90">
-                            <i class="i-svg-spinners-ring-resize font-size-12 color-#1677ff"></i>
-                        </div>
-                        <div class="flex" v-if="smallVideoList.length > 1">
-                            <div class="scrollbar-small-x fenjing-list">
-                                <div class="whitespace-nowrap">
-                                    <div v-for="(item, idx) in smallVideoList" :key="idx" :class="`fenjinCard ${item.selected ? 'active' : ''}`" @click="handleChangeShot(item)">
-                                        {{ idx + 1 }}
+            <div class="h-100% w-100% flex items-center justify-center">
+                <div class="w-100% px-4 py-4 lg:flex lg:items-center lg:justify-center lg:px-0">
+                    <div class="relative mt-10 max-w-220 w-100% flex items-center justify-center rounded-1 lg:mx-10 lg:mx-4 lg:mt-0 lg:p-2 lg:p-4" draggable>
+                        <div class="absolute left-0 top--8 font-size-4 color-#999 font-bold lg:left-4 lg:top--5 lg:font-size-5">{{ currentVideo.url }}</div>
+                        <div v-if="currentVideo.url" class="w-100% bg-white p-4 lg:min-h-140">
+                            <div class="w-100% flex items-center justify-center" v-if="!currentLoading">
+                                <video class="z-140 h-auto w-100% object-cover rounded-1" controls playsinline>
+                                    <source :src="`${videoPath}/${currentVideo.url}`" type="video/mp4">
+                                </video>
+                            </div>
+                            <div v-else class="w-100% flex items-center justify-center h-90">
+                                <i class="i-svg-spinners-ring-resize font-size-12 color-#1677ff"></i>
+                            </div>
+                            <!-- <div class="flex" v-if="smallVideoList.length > 1">
+                                <div class="scrollbar-small-x fenjing-list">
+                                    <div class="whitespace-nowrap">
+                                        <div v-for="(item, idx) in smallVideoList" :key="idx" :class="`fenjinCard ${item.selected ? 'active' : ''}`" @click="handleChangeShot(item)">
+                                            {{ idx + 1 }}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="w-8% flex items-center justify-end" v-if="!currentVideo?.isMainVideo">
-                                <TheButton :title="t('workbench.views.setMainVideo')" class="topBtn" class-name="lh-10 h-10 color-#666 mt-2 ml-0 pl-0 pr-0 w-100%" @click="handleSetMainVideo" :loading="mainLoading">
-                                    <i class="i-bx-arrow-to-top font-size-6 color-#9f54ba"></i>
-                                </TheButton>
-                            </div>
-                        </div>
-                        <div class="mt-4 w-100% items-center justify-between lg:flex">
-                            <div class="flex">
-                                <TheButton @click="handleDownload" type="border" class-name="h-8 mr-4">
-                                    <i class="i-material-symbols-download-2-rounded"></i> {{ t('workbench.views.download') }}
-                                </TheButton>
+                                <div class="w-8% flex items-center justify-end" v-if="!currentVideo?.isMainVideo">
+                                    <TheButton :title="t('workbench.views.setMainVideo')" class="topBtn" class-name="lh-10 h-10 color-#666 mt-2 ml-0 pl-0 pr-0 w-100%" @click="handleSetMainVideo" :loading="mainLoading">
+                                        <i class="i-bx-arrow-to-top font-size-6 color-#9f54ba"></i>
+                                    </TheButton>
+                                </div>
+                            </div> -->
+                            <div class="mt-4 w-100% items-center justify-between lg:flex">
+                                <div class="flex">
+                                    <TheButton @click="handleDownload" type="border" class-name="h-8 mr-4">
+                                        <i class="i-material-symbols-download-2-rounded"></i> {{ t('workbench.views.download') }}
+                                    </TheButton>
 
+                                </div>
+                                <div class="share-list font-size-7">
+                                    <a href="http://" target="_blank" class="lg:ml-6" rel="noopener noreferrer">
+                                        <i class="i-logos-twitter"></i>
+                                    </a>
+                                    <a href="http://" target="_blank" class="ml-6" rel="noopener noreferrer">
+                                        <i class="i-logos-discord-icon"></i>
+                                    </a>
+                                    <a href="http://" target="_blank" class="ml-6" rel="noopener noreferrer">
+                                        <i class="i-cib-wechat color-green"></i>
+                                    </a>
+                                    <a href="http://" target="_blank" class="ml-6" rel="noopener noreferrer">
+                                        <i class="i-logos-telegram"></i>
+                                    </a>
+                                </div>
                             </div>
-                            <div class="share-list font-size-7">
-                                <a href="http://" target="_blank" class="lg:ml-6" rel="noopener noreferrer">
-                                    <i class="i-logos-twitter"></i>
-                                </a>
-                                <a href="http://" target="_blank" class="ml-6" rel="noopener noreferrer">
-                                    <i class="i-logos-discord-icon"></i>
-                                </a>
-                                <a href="http://" target="_blank" class="ml-6" rel="noopener noreferrer">
-                                    <i class="i-cib-wechat color-green"></i>
-                                </a>
-                                <a href="http://" target="_blank" class="ml-6" rel="noopener noreferrer">
-                                    <i class="i-logos-telegram"></i>
-                                </a>
-                            </div>
-                        </div>
 
-                    </div>
-                    <div class="w-100% flex items-center justify-center h-120" v-else>
-                        <TheNoData />
+                        </div>
+                        <div class="w-100% flex items-center justify-center bg-white h-40 lg:h-140" v-else>
+                            <TheNoData />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -308,14 +310,15 @@ const smallVideoList = computed(() => {
 
 .right-video-list {
     height: calc(100vh - 4.5rem);
-    --at-apply: lg:mt-3 pt-1 px-2 w-100% lg:w-47.5;
+    --at-apply: pt-4 px-4 w-100% lg:w-47.5;
+    border-left: 1px solid #eee;
 }
 
 @media screen and (max-width: 1024px) {
 
     :deep() {
         .left-box .the-telescoping-box {
-            --at-apply: h-80;
+            --at-apply: max-h-82;
 
             .h-100vh {
                 height: 100%;
@@ -332,7 +335,10 @@ const smallVideoList = computed(() => {
     }
 
     .right-video-list {
-        --at-apply: h-40 px-4;
+        --at-apply: h-44 px-4;
+        border-left: none;
+        border-top: 1px solid #eee;
+
 
         .right-video-card {
             --at-apply: mb-0;

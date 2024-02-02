@@ -3,7 +3,8 @@ export default {
     backHome: 'Back to the home page',
     creating: 'Added to the task queue in the process of production...',
     queuing: 'In line',
-    hasQueueNum: 'In front of there are {number}'
+    hasQueueNum: 'In front of there are {number}',
+    submit: 'Submit'
   },
 
   home: {
@@ -19,6 +20,7 @@ export default {
     noContent: 'No content currently',
     yourPieces: 'Your Pieces',
     pieceIptPlaceholder: 'Title your piece',
+    community: 'Community',
     realistic: 'Realistic',
     anime: 'Anime'
   },
@@ -27,7 +29,10 @@ export default {
     title2: 'comics and anime videos from text content.',
     brandTit: 'LiminoAI',
     loginToLimino: 'Login to Limino',
-    signToGoogle: 'Sign in with Google'
+    signToGoogle: 'Sign in with Google',
+    inputEmail: 'Email',
+    emailTit: 'Fill in your email address to apply for whitelisting',
+    loginIn: 'Login to LiminoAI'
   },
   workbench: {
     brandTit: 'LiminoAI',
@@ -109,6 +114,7 @@ export default {
       share: 'Share',
       setMainVideo: 'Set as the main video',
       createVideo: 'Generate videos',
+      recreateVideo: 'Regenerate the video',
       nextStoryboarding: 'The next batch of storyboards',
       creating: 'Generating',
       fenjing: 'Storyboarding'
@@ -140,7 +146,8 @@ export default {
     hasFejingQueueWorking:
       'You currently have a storyboard generation task running, please try again later',
     noFenjing: 'There is no storyboard data for the script',
-    chooseMergeVideos: 'Please select the videos you want to merge'
+    chooseMergeVideos: 'Please select the videos you want to merge',
+    emailError: "The email address doesn't follow the rules"
   },
   successMessage: {
     createSuccess: 'It has been submitted to the task queue, please be patient',

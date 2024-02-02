@@ -28,6 +28,6 @@ app.use(LoadingPlugin)
 app.use(BackTopPlugin, {
   right: 16,
   bottom: 42,
-  activityTop: 200
+  activityTop: 300
 })
 app.mount('#app')

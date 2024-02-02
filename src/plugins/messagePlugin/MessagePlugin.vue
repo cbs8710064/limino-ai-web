@@ -63,23 +63,23 @@ const createOptions = (type: MessageType, message: string, hasClose: boolean = f
 }
 
 const info = (message: string) => {
-    const type: MessageType = 'info'
+    const type = 'info'
     return open(createOptions(type, message))
 }
 const success = (message: string) => {
-    const type: MessageType = 'success'
+    const type = 'success'
     return open(createOptions(type, message))
 }
 const warning = (message: string) => {
-    const type: MessageType = 'warning'
+    const type = 'warning'
     return open(createOptions(type, message))
 }
 const error = (message: string) => {
-    const type: MessageType = 'error'
-    return open({ ...createOptions(type, message, true), duration: 180000 })
+    const type = 'error'
+    return open({ ...createOptions(type, message, true), duration: 7000 })
 }
 const loading = (message: string) => {
-    const type: MessageType = 'loading';
+    const type = 'loading';
     return open(createOptions(type, message))
 }
 onBeforeRouteUpdate(() => {

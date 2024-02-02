@@ -22,6 +22,7 @@ const message = useMessage()
 onMounted(async () => {
   createStore.setStep(2)
   taskStore.loopTasks(2, 'gen_cover')
+  storyListStore.getStoryList()
 })
 onUnmounted(() => {
   taskStore.clearLoop()
@@ -59,23 +60,26 @@ const handleUpdateStoryCover = async () => {
       <StoryList></StoryList>
     </TheTelescoping>
     <div class="middle-box scrollbar-small-y w-100% lg:h-93.3vh">
-      <div class="min-h-40vh w-100% flex items-start justify-center py-4 lg:mt-10 lg:min-h-140 lg:items-center lg:py-10">
+      <div class="min-h-40 w-100% flex items-start justify-center py-4 lg:mt-10 lg:min-h-140 lg:items-center lg:py-10">
         <div class="relative max-w-220 w-100% px-4 py-2 rounded-1 lg:mx-10 lg:mt-0 lg:min-h-100 lg:p-4">
           <div v-if="storyListStore.selectedStory?.cover && !taskStore.tasks.gen_cover" class="bg-mask">
             <div class="flex justify-center">
               <Image loading="lazy" :src="`${videoPath}/${storyListStore.selectedStory.cover}`" :preview="false" class="w-100%"></Image>
             </div>
           </div>
-          <div class="w-100% flex items-center justify-center bg-white h-120" v-else>
+          <div class="max-h-120 w-100% flex items-center justify-center bg-white py-4 lg:min-h-140" v-else>
             <TheNoData v-if="!taskStore.tasks.gen_cover" />
-            <Progress v-else type="circle" :percent="taskStore.tasks.gen_cover?.percent">
+            <Progress v-else type="circle" :percent="taskStore.tasks.gen_cover?.percent" :size="200">
               <template #format>
                 <div>
                   <div class="font-size-4 color-#9f54ba" v-if="taskStore.tasks.gen_cover.status === 1">
-                    <div class="text-center">{{ t('common.queuing') }}</div>
-                    <div class="text-center">{{ t("common.hasQueueNum", { number: taskStore.tasks.gen_cover.queue }) }}</div>
+                    <div class="mb-2 text-center font-size-7 font-bold">0%</div>
+                    <div class="flex items-center justify-center">
+                      <i class="i-fluent-people-queue-24-filled font-size-7"></i>
+                      <span class="font-size-5 font-bold">{{ taskStore.tasks.gen_cover.queue }}</span>
+                    </div>
                   </div>
-                  <div v-else class="text-center">{{ taskStore.tasks.gen_cover.percent }}%</div>
+                  <div v-else class="text-center font-size-7 font-bold">{{ taskStore.tasks.gen_cover.percent }}%</div>
                 </div>
               </template>
             </Progress>
@@ -87,7 +91,7 @@ const handleUpdateStoryCover = async () => {
     <TheTelescoping width="300px" direction="left" class="right-box">
       <div class="h-100vh px-4 lg:px-6">
         <div v-if="storyListStore.selectedStory">
-          <div class="mt-2 font-bold lh-10">{{ t('workbench.views.cover.prompt') }}</div>
+          <div class="mt-2 font-bold lh-10 lg:mt-0">{{ t('workbench.views.cover.prompt') }}</div>
           <div>
             <textarea v-model="storyPrompt" class="w-100% resize-none" rows="10" maxlength="256" :placeholder="t('workbench.views.cover.placeholder')"></textarea>
           </div>
@@ -119,7 +123,7 @@ const handleUpdateStoryCover = async () => {
   @media screen and (max-width: 1024px) {
     :deep() {
       .left-box .the-telescoping-box {
-        --at-apply: h-42;
+        --at-apply: max-h-42;
 
         .h-100vh {
           height: 100%;
@@ -127,11 +131,11 @@ const handleUpdateStoryCover = async () => {
       }
 
       .right-box .the-telescoping-box {
-        --at-apply: h-90;
+        --at-apply: max-h-90;
       }
 
       .story-list {
-        --at-apply: flex h-40 flex-row w-100%;
+        --at-apply: flex max-h-40 flex-row w-100%;
 
         .post-item {
           --at-apply: min-w-28 mr-2 max-w-28;

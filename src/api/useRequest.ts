@@ -117,8 +117,41 @@ function updateStoryCover(id: number, prompt: string) {
   return service.post(`/stories/${id}/cover?prompt=${encodeURIComponent(prompt)}`)
 }
 
+/**
+ *  get logs of owner
+ * @returns
+ */
 function getLogs() {
   return service.get('/getlogs')
+}
+/**
+ * get all logs
+ * @returns
+ */
+function getAllLogs() {
+  return service.get('/getalllogs')
+}
+
+/**
+ * get roles of owner by storyId
+ * @param id
+ * @returns
+ */
+function getRolesByStoryId(id: number) {
+  return service.get(`/stories/${id}/roles`)
+}
+
+/**
+ * get scripts of owner by storyId
+ * @param id
+ * @returns
+ */
+function getScriptsByStoryId(id: number) {
+  return service.get(`/stories/${id}/roles`)
+}
+
+function getIndexList(): Promise<any[]> {
+  return service.get('/index')
 }
 
 export const useRequest = (): UseRequestReturns => {
@@ -134,6 +167,10 @@ export const useRequest = (): UseRequestReturns => {
     setMainVideo,
     getTasks,
     updateStoryCover,
-    getLogs
+    getLogs,
+    getAllLogs,
+    getRolesByStoryId,
+    getScriptsByStoryId,
+    getIndexList
   }
 }

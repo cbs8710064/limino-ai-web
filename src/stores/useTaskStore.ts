@@ -1,8 +1,8 @@
 import { useRequest } from '@/api/useRequest'
 import { defineStore } from 'pinia'
-import { ref, type Ref } from 'vue'
+import { computed, ref, type Ref } from 'vue'
 const { getTasks } = useRequest()
-import { ids, setIds, getIds } from '@/stores/useStoryListStore'
+import { ids, setIds } from '@/stores/useStoryListStore'
 export type TaskType = 'gen_video' | 'gen_shots' | 'gen_role' | 'gen_cover' | 'init_story'
 type TaskResponse = {
   args: any[]
@@ -122,10 +122,12 @@ export const useTaskStore = defineStore('taskStore', () => {
       }
     }
   }
+  const hasVideoTask = computed(() => tasks.value.gen_video)
 
   return {
     tasks,
     clearLoop,
-    loopTasks
+    loopTasks,
+    hasVideoTask
   }
 })

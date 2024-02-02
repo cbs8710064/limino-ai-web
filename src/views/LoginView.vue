@@ -3,13 +3,34 @@
 import { RouterLink } from 'vue-router';
 import TheButton from '@/components/TheButton.vue';
 import { useI18n } from 'vue-i18n';
+import { ref } from 'vue';
+import { reg_email } from '../const/regrex';
+import { useMessage } from '../hooks/useMessage';
+import { useUserRequest } from '../api/useUserRequest';
+const { newUser } = useUserRequest()
 const { t } = useI18n()
+const message = useMessage()
+const email = ref('')
+const loading = ref(false)
+const handleSubmit = async () => {
+  if (!reg_email.test(email.value)) {
+    message.warning(t('warnMessage.emailError'))
+  } else {
+    // TODO fetch
+    const res = await newUser(email.value)
+    if (res?.id) {
+      message.success('注册成功，请留意邮箱')
+    } else {
+      message.error('注册失败')
+    }
+  }
+}
 </script>
 <template>
   <div class="login-view flex flex-col lg:w-100% lg:flex-row">
     <div class="login-left min-h-40vh w-100% flex flex-col lg:min-h-100vh lg:w-50vw lg:flex-row">
       <RouterLink to="/" class="absolute left-0 top-0 w-50vw">
-        <div class="brand-tit flex items-center justify-start px-10 py-5 font-size-6 color-white font-bold lg:font-size-8">{{ t('login.brandTit') }} <img class="ml-4 w-8" src="@/assets/images/home/pencil.png" alt=""></div>
+        <div class="brand-tit flex items-center justify-start px-10 py-5 font-size-6 color-white font-bold lg:font-size-8">{{ t('login.brandTit') }} <img class="ml-4 w-5 lg:w-8" src="@/assets/images/home/pencil.png" alt=""></div>
       </RouterLink>
       <div class="flex flex-full items-center justify-end lg:pr-20">
         <div class="text-info max-w-180 px-4 text-center font-size-5 font-bold lg:max-w-100 lg:text-left lg:font-size-7">
@@ -19,16 +40,22 @@ const { t } = useI18n()
         </div>
       </div>
     </div>
-    <div class="login-right min-h-50vh w-100% flex items-start justify-center lg:min-h-100vh lg:w-50vw lg:items-center lg:justify-start lg:pl-30">
+    <div class="login-right min-h-60vh w-100% flex items-start justify-center lg:min-h-100vh lg:w-50vw lg:items-center lg:justify-start lg:pl-30">
       <div>
-        <div class="mt-10 text-center font-size-4 font-bold lg:mt-0 lg:text-left lg:font-size-6">Login to LiminoAI</div>
-        <TheButton type="border" class="mt-10">
+        <div class="mt-10 text-center font-size-5 font-bold lg:mt-0 lg:text-left lg:font-size-6">{{ t('login.loginIn') }}</div>
+        <!-- <TheButton type="border" class="mt-10">
           <i class="i-logos-google-icon mr-4"></i> {{ t('login.signToGoogle') }}
         </TheButton>
         <div class="mt-10 flex justify-evenly lg:justify-items-start">
-          <!-- <div class="google login-card"><i class="i-logos-google-icon font-size-6"></i></div> -->
+          <div class="google login-card"><i class="i-logos-google-icon font-size-6"></i></div>
           <div class="login-card wechat"><i class="i-cib-wechat font-size-6"></i></div>
           <div class="login-card"><i class="i-logos-telegram font-size-10"></i></div>
+        </div> -->
+        <div class="mt-5 text-center font-size-4 lg:text-left">{{ t('login.emailTit') }}</div>
+        <div class="mt-4"><input type="email" v-model="email" class="w-100% lh-10" :placeholder="t('login.inputEmail')" /></div>
+        <div class="mt-4 items-end justify-center lg:flex lg:justify-start">
+          <TheButton class="min-w-30" type="border" @click="handleSubmit" :loading="loading">{{ t('common.submit') }}</TheButton>
+          <!-- <div class="color-grey register text-center mt-4 lg:mt-0 lg:ml-4 cursor-pointer font-size-3.4">已经注册过? 登录</div> -->
         </div>
       </div>
     </div>
@@ -38,6 +65,11 @@ const { t } = useI18n()
 .login-left {
   background-color: #9f54ba;
   color: #fff;
+}
+
+.register:hover {
+  color: #9f54ba;
+  text-decoration: underline;
 }
 
 .login-right {

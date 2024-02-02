@@ -25,6 +25,8 @@ const { selectStoryRole } = storeToRefs(storyListStore)
 const createStore = useCreateStore()
 onMounted(() => {
     createStore.setStep(3)
+    storyListStore.getStoryList()
+
     eventBus.on('headerNextEvent', () => {
         router.push({ name: 'paragraph' })
     })
@@ -66,7 +68,7 @@ const handleCreateCharacter = async () => {
 const handleChangeStory = (e: StoryItem) => {
     const { id } = e
     storyListStore.selectRoleByStoryId(Number(id), 0)
-    if (e.roles.roles && e.roles.roles.length) {
+    if (e.roles?.roles && e.roles.roles?.length) {
         rolePrompt.value = e.roles.roles[0].prompts
     }
 }
@@ -98,8 +100,8 @@ watch(() => storyListStore.selectStoryRole, n => {
         <TheTelescoping direction="right" width="380px" class="left-box">
             <div class="h-auto pb-2 lg:h-100vh lg:flex lg:pb-0">
                 <StoryList @change="handleChangeStory" />
-                <div class="scrollbar-small-x lg:scrollbar-small-y character-list px-4 lg:px-4" v-if="storyListStore?.selectedStory?.roles.roles && storyListStore?.selectedStory?.roles.roles.length">
-                    <div @click="handleChangeRole({ ...item, idx })" :class="`character-card ${item.selected ? 'active' : ''}`" v-for="(item, idx) in storyListStore?.selectedStory?.roles.roles" :key="idx">
+                <div class="scrollbar-small-x lg:scrollbar-small-y character-list px-4 lg:px-4" v-if="storyListStore?.selectedStory?.roles?.roles && storyListStore?.selectedStory?.roles?.roles.length">
+                    <div @click="handleChangeRole({ ...item, idx })" :class="`character-card ${item.selected ? 'active' : ''}`" v-for="(item, idx) in storyListStore?.selectedStory?.roles?.roles" :key="idx">
                         <div class="character-card-img">
                             <div class="role-img w-100%" v-if="item.image">
                                 <Image loading="lazy" :src="`${videoPath}/${item.image}`" :preview="false" class="object-contain w-20 rounded-1 lg:w-100%" width="100%"></Image>
@@ -108,7 +110,7 @@ watch(() => storyListStore.selectStoryRole, n => {
                                 <i class="i-svg-spinners-ring-resize font-size-8 color-#1677ff"></i>
                             </div>
                         </div>
-                        <div class="line-clamp-1 overflow-hidden text-ellipsis px-1 font-size-3 lh-6 h-6 lg:font-size-3.5 lg:lh-9">{{ item.name }}</div>
+                        <div class="line-clamp-1 overflow-hidden text-ellipsis px-1 font-size-3 lh-6 h-6 lg:font-size-3.5 lg:lh-9 lg:h-9">{{ item.name }}</div>
                     </div>
                 </div>
                 <div v-else class="h-100% w-100% p-4 text-center font-size-4 color-#ccc lg:text-left">
@@ -118,21 +120,24 @@ watch(() => storyListStore.selectStoryRole, n => {
         </TheTelescoping>
         <div class="con scrollbar-small-y w-100% px-4 py-4 lg:h-93vh lg:px-10 lg:py-10">
             <div class="h-100% w-100% flex items-center justify-center">
-                <div :class="`relative w-100% flex items-center rounded-1 justify-center px-2 h-140 ${selectStoryRole?.image && !taskStore.tasks.gen_role ? 'bg-mask' : 'bg-white'}`">
+                <div :class="`relative w-100% flex items-center rounded-1 justify-center px-2 h-auto max-h-140 lg:min-h-140 ${selectStoryRole?.image && !taskStore.tasks.gen_role ? 'bg-mask' : 'bg-white'}`">
                     <img v-if="!taskStore.tasks.gen_role && selectStoryRole?.image" :src="`${videoPath}/${selectStoryRole?.image}`" class="w-100% object-contain h-140 rounded-1" alt="">
-                    <div v-else class="flex items-center justify-center h-140">
-                        <Progress v-if="taskStore.tasks.gen_role" type="circle" :percent="taskStore.tasks.gen_role?.percent">
+                    <div v-else class="max-h-140 flex items-center justify-center">
+                        <Progress v-if="taskStore.tasks.gen_role" type="circle" :percent="taskStore.tasks.gen_role?.percent" :size="200">
                             <template #format>
                                 <div>
                                     <div class="font-size-4 color-#9f54ba" v-if="taskStore.tasks.gen_role.status === 1">
-                                        <div class="text-center">{{ t('common.queuing') }}</div>
-                                        <div class="text-center">{{ t("common.hasQueueNum", { number: taskStore.tasks.gen_role.queue }) }}</div>
+                                        <div class="mb-2 text-center font-size-7 font-bold">0%</div>
+                                        <div class="flex items-center justify-center">
+                                            <i class="i-fluent-people-queue-24-filled font-size-7"></i>
+                                            <span class="font-size-5 font-bold">{{ taskStore.tasks.gen_role.queue }}</span>
+                                        </div>
                                     </div>
-                                    <div v-else class="text-center">{{ taskStore.tasks.gen_role.percent }}%</div>
+                                    <div v-else class="text-center font-size-7 font-bold">{{ taskStore.tasks.gen_role.percent }}%</div>
                                 </div>
                             </template>
                         </Progress>
-                        <div v-else class="flex items-center justify-center px-15 h-140">
+                        <div v-else class="flex items-center justify-center px-15 h-50">
                             <TheNoData />
                         </div>
                     </div>
@@ -165,7 +170,7 @@ watch(() => storyListStore.selectStoryRole, n => {
 
         :deep() {
             .ant-image img {
-                height: 10rem !important;
+                height: 10rem;
             }
         }
     }
@@ -203,12 +208,16 @@ watch(() => storyListStore.selectStoryRole, n => {
 
 .character-list {
     max-height: calc(100vh - 3.5rem);
-    --at-apply: pt-4 w-47.5;
+    --at-apply: w-47.5 lg:pt-4;
+    border-left: 1px solid #eee;
 }
 
 @media screen and (max-width: 1024px) {
     .character-list {
-        --at-apply: w-100% flex h-40 pb-2;
+        --at-apply: w-100% flex max-h-40 py-4;
+        border-left: none;
+        border-top: 1px solid #eee;
+
     }
 
     .character-card {
@@ -225,13 +234,16 @@ watch(() => storyListStore.selectStoryRole, n => {
     }
 
     :deep() {
+        .role-img {
 
-        .ant-image img {
-            height: 5.2rem !important;
+            .ant-image img {
+                height: 5.2rem !important;
+            }
+
         }
 
         .ipt-box .the-telescoping-box {
-            --at-apply: h-130;
+            --at-apply: h-110 max-h-100%;
 
             .h-100vh {
                 height: 100%;
@@ -239,7 +251,7 @@ watch(() => storyListStore.selectStoryRole, n => {
         }
 
         .left-box .the-telescoping-box {
-            --at-apply: h-78;
+            --at-apply: max-h-78 h-auto;
 
             .h-100vh {
                 height: 100%;
