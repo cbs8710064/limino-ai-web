@@ -16,9 +16,6 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@ffmpeg/core": "^0.12.6",
-    "@ffmpeg/ffmpeg": "0.12.8",
-    "@ffmpeg/util": "^0.12.1",
     "animejs": "^3.2.2",
     "ant-design-vue": "^4.1.0",
     "file-saver": "^2.0.5",

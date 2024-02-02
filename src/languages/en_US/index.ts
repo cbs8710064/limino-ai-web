@@ -30,7 +30,7 @@ export default {
     brandTit: 'LiminoAI',
     loginToLimino: 'Login to Limino',
     signToGoogle: 'Sign in with Google',
-    inputEmail: 'Email',
+    inputEmail: 'Enter your email address',
     emailTit: 'Fill in your email address to apply for whitelisting',
     loginIn: 'Login to LiminoAI'
   },

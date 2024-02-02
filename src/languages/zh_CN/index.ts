@@ -30,7 +30,7 @@ export default {
     brandTit: 'LiminoAI',
     loginToLimino: '登录到Limino',
     signToGoogle: '使用谷歌账户登录',
-    inputEmail: '邮箱地址',
+    inputEmail: '输入您的邮箱地址',
     emailTit: '填写邮箱地址申请加入白名单',
     loginIn: '登录到 LiminoAI'
   },

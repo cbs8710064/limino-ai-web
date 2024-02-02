@@ -2,7 +2,7 @@
 <script setup lang='ts'>
 import { ref, type Ref, onMounted, onUnmounted, computed } from 'vue';
 
-import { type DropdownOption, type DropTrigger, type DropAlign } from '@/types/components';
+import type { DropdownOption, DropTrigger, DropAlign } from '@/types/components';
 import { useDocumentClick } from '@/hooks/useDocumentClick';
 
 const triggerRef: Ref<HTMLElement | undefined> = ref()
@@ -91,6 +91,7 @@ useDocumentClick(() => {
     background-color: #eeeeee;
     color: #0d0d0d;
 }
+
 .options-card.active {
     color: #9f54ba;
 }
