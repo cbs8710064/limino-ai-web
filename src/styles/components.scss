@@ -1,5 +1,5 @@
 .btn {
-  --at-apply: px-4 font-size-4 lh-10 text-center select-none font-bold cursor-pointer flex justify-center items-center;
+  --at-apply: px-2 font-size-3.5 lh-10 lg:px-4 font-size-4 lg:lh-10 text-center select-none font-bold cursor-pointer flex justify-center items-center;
 }
 
 .btn.default {
@@ -29,9 +29,8 @@
 
 input {
   border: 1px solid #eee;
-  line-height: 36px;
-  border-radius: 6px;
   padding: 0 8px;
+  --at-apply: font-size-3.5 lh-10 h-10 px-2 rounded-2;
 
   &:hover {
     border-color: #c6a4d1;
@@ -66,8 +65,14 @@ textarea::placeholder {
 
 
 
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
+.scrollbar-none {
+
+  scrollbar-width: 0;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .scrollbar-small {
@@ -124,14 +129,14 @@ a {
 
 
 @media screen and (max-width: 1024px) {
-  .btn {
-    --at-apply: px-2 font-size-3.5 lh-8;
-  }
+  // .btn {
+  //   --at-apply: px-2 font-size-3.5 lh-10;
+  // }
 
-  input {
-    --at-apply: font-size-3.5 lh-8 h-8 px-2;
-    border-radius: 4px;
-  }
+  // input {
+  //   --at-apply: font-size-3.5 lh-8 h-8 px-2;
+  //   border-radius: 4px;
+  // }
 
   .scrollbar-small-y,
   .scrollbar-small-x {

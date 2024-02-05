@@ -3,7 +3,8 @@ import { watch, ref } from 'vue';
 import useKeyEventAddlistener from '../hooks/useKeyEventAddlistener';
 import { useI18n } from 'vue-i18n';
 import TheButton from '@/components/TheButton.vue';
-
+import useLockBodyScroll from '../hooks/useLockBodyScroll';
+const { lockBodyScroll, unLockBodyScroll } = useLockBodyScroll()
 const props = defineProps<{
     modelValue: boolean;
     title?: string;
@@ -17,6 +18,7 @@ const props = defineProps<{
     hasClose?: boolean;
     clickClose?: boolean;
     hasMask?: boolean
+    lockScroll?: boolean
 }>()
 
 const { t } = useI18n()
@@ -48,9 +50,15 @@ watch(() => props.modelValue, (n) => {
                 }
             })
         }
+        if (props.lockScroll) {
+            lockBodyScroll()
+        }
     } else {
         closeLoading()
         removeEvent ? removeEvent() : ''
+        if (props.lockScroll) {
+            unLockBodyScroll()
+        }
     }
 }, {
     immediate: true,

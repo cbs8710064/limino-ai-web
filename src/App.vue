@@ -1,19 +1,15 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import { useI18n } from 'vue-i18n';
-import { onMounted } from 'vue';
-import { createUUID } from './utils/utils';
-import { uuidKey } from './const/index';
 import { ConfigProvider, StyleProvider } from 'ant-design-vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import enUS from 'ant-design-vue/es/locale/en_US'
+import { useUserStore } from '@/stores/useUserStore';
+const userStore = useUserStore()
 const { locale } = useI18n()
-onMounted(() => {
-  const localUid = localStorage.getItem(uuidKey)
-  if (!localUid) {
-    localStorage.setItem(uuidKey, createUUID())
-  }
-})
+if (userStore.userInfo?.email) {
+  userStore.loginIn(userStore.userInfo?.email)
+}
 </script>
 
 <template>

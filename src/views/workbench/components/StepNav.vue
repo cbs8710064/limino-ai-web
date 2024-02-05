@@ -1,23 +1,35 @@
 <script setup lang='ts'>
-import { Progress } from 'ant-design-vue'
+import { Progress, message } from 'ant-design-vue';
 import { useCreateStore } from '@/stores/useCreateStore';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import useScroll from '../../../hooks/useScroll';
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useTaskStore } from '../../../stores/useTaskStore';
+import { useStoryListStore } from '../../../stores/useStoryListStore';
 const router = useRouter()
 const { t } = useI18n()
 defineProps<{
     step: number
 }>()
-
+const storyListStore = useStoryListStore()
 const createStore = useCreateStore()
 const taskStory = useTaskStore()
 const handleNext = (step: number, routeName: string) => {
+    if (step > 1 && !storyListStore.list.length) {
+        message.warn(t('warnMessage.pleaseCreateStory'))
+        return
+    }
     createStore.setStep(step)
     router.push({ name: routeName })
 }
+onMounted(() => {
+    taskStory.handleLoopTaskOnEvent(2, 'gen_video')
+})
+
+onUnmounted(() => {
+    taskStory.clearLoop()
+})
 
 const fixedClass = ref('')
 const scrollUpClass = ref('')
@@ -35,7 +47,7 @@ useScroll(({ top, direction }) => {
         <RouterLink to="/" class="flex items-center justify-center">
             <div class="brand-tit text-center font-size-4 color-white font-bold lg:mb-10 lg:pt-10">{{ t('workbench.brandTit') }}</div>
         </RouterLink>
-        <div class="step-list flex color-white lg:block lg:min-h-90vh lg:py-5 lg:pt-0">
+        <div class="step-list flex color-white lg:block lg:min-h-90vh lg:pt-0 lg:pt-5">
             <div :class="`story step-card relative ${!step || step === 1 ? 'active' : ''}`" @click="handleNext(1, 'story')">
                 <div class="relative">
                     <div class="story-con">
@@ -94,7 +106,7 @@ useScroll(({ top, direction }) => {
                 <div class="relative">
                     <div class="story-con">
                         <div class="icon">
-                            <i class="i-lets-icons-img-box-fill font-size-8"></i>
+                            <i class="i-material-symbols-auto-videocam font-size-8"></i>
                         </div>
                     </div>
                     <div v-if="taskStory.tasks.gen_video" class="progress-bar">
@@ -155,6 +167,7 @@ useScroll(({ top, direction }) => {
 
 .step-list {
     --at-apply: w-80vw lg:w-100% flex justify-right lg:block;
+    background-color: #9f54ba;
 }
 
 .arraw-right {
@@ -205,7 +218,7 @@ useScroll(({ top, direction }) => {
     }
 
     .text {
-        --at-apply: text-center font-size-2.5 lg:font-size-4 font-bold mt-1 ;
+        --at-apply: text-center font-size-2.5 lg:font-size-4 font-bold mt-1;
         text-shadow: 1px 1px 2px rgb(53, 52, 52);
     }
 

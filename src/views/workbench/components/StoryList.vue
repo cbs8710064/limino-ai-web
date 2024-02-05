@@ -5,12 +5,17 @@ import { useStoryListStore, type StoryItem } from '../../../stores/useStoryListS
 import { useI18n } from 'vue-i18n';
 import TheModal from '@/components/TheModal.vue';
 import { useMessage } from '../../../hooks/useMessage';
-import { Image, Progress } from 'ant-design-vue'
+import { Image, Progress, Popover } from 'ant-design-vue'
 import { videoPath } from '@/const';
 import { useEventBus } from '../../../hooks/useBus';
 import { useTaskStore } from '../../../stores/useTaskStore';
+import { useUserStore } from '../../../stores/useUserStore';
+import { useRequest } from '../../../api/useRequest';
+import { onBeforeUnmount } from 'vue';
 const taskStore = useTaskStore()
+const userStore = useUserStore()
 const message = useMessage()
+const { createAllVideoById } = useRequest()
 const { t } = useI18n()
 const storyListStore = useStoryListStore()
 const { eventBus } = useEventBus()
@@ -50,22 +55,35 @@ const confirmDelete = async (close: Function) => {
         close()
     }
 }
+const handleAllCreate = async (e: StoryItem) => {
+    if (e) {
+        storyListStore.setStorySelected(e.id)
+    }
+    if (storyListStore.selectedStory?.id) {
+        const res = await createAllVideoById(storyListStore.selectedStory.id, { index: 0, auto_next: true })
+        if (!res.error) {
+            message.success(t('successMessage.createAllVideosSuccess'))
+        } else {
+            message.warning(t('warnMessage.createAllVideoWarn'))
+        }
+    }
+}
 
 onMounted(() => {
-    taskStore.loopTasks(2, 'init_story')
-    eventBus.on('addStoryEvent', () => {
-        taskStore.loopTasks(2, 'init_story')
-    })
+    taskStore.handleLoopTaskOnEvent(2, 'init_story')
+
 })
 onUnmounted(() => {
-    eventBus.off('addStoryEvent')
+
     taskStore.clearLoop()
 })
+
+
 </script>
 <template>
     <div>
         <div class="scrollbar-small-x lg:scrollbar-small-y story-list px-4 pt-4 lg:pl-4 lg:pr-3" v-if="storyListStore.list.length">
-            <div :class="`post-item ${item.selected ? 'active' : ''}`" v-for="item in storyListStore.list" :key="item.id" @click.stop="handleChooseStory(item)">
+            <div :class="`post-item ${item.selected ? 'active' : ''}`" v-for="(item, index) in storyListStore.list" :key="item.id" @click.stop="handleChooseStory(item)" :id="`story${index}`">
                 <div class="absolute top-0 z-1 mb-1 flex items-center justify-between right-0">
                     <div class="flex cursor-pointer items-center font-size-5" v-if="hasBtns">
                         <i class="i-material-symbols-delete color-#666" @click.stop="handleDelete(item)"></i>
@@ -84,7 +102,7 @@ onUnmounted(() => {
                                                 <span class="font-size-4 font-bold">{{ taskStore.tasks.init_story.queue }}</span>
                                             </div>
                                         </div>
-                                        <div v-else class="text-center color-white">{{ taskStore.tasks.init_story.percent }}%</div>
+                                        <div v-else class="text-center color-white font-bold">{{ taskStore.tasks.init_story.percent }}%</div>
                                     </div>
                                 </template>
                             </Progress>
@@ -92,7 +110,17 @@ onUnmounted(() => {
                         <div v-else class="flex items-center justify-center p-2 w-25 h-25 lg:p-4 lg:w-35 lg:h-35">
                             <Image loading="lazy" v-if="item?.cover" :src="`${videoPath}/${item.cover}`" :preview="false" class="h-100% w-90% object-contain rounded-1" />
                             <i v-else class="i-svg-spinners-ring-resize mr-2 font-size-10 color-#fff"></i>
+
                         </div>
+                        <Popover placement="right">
+                            <template #content>
+                                {{ t('common.useAllScriptCreate') }}
+                            </template>
+                            <div class="absolute bottom-1 z-10 rounded-full bg-white right-1" v-if="userStore.userInfo?.user?.token && item.ready && !item.hasTask" @click="handleAllCreate(item)">
+                                <i class="i-material-symbols-play-circle-rounded font-size-5 color-#1677ff"></i>
+                            </div>
+                        </Popover>
+
                     </div>
                 </div>
                 <div class="overflow-hidden text-ellipsis whitespace-nowrap px-1 text-center font-size-3 font-bold lh-7 lg:px-0 lg:font-size-3.5">{{ item.name }}</div>
@@ -139,7 +167,7 @@ onUnmounted(() => {
         border: 2px solid #9f54ba;
 
         .story-img {
-            background: radial-gradient(rgb(169, 91, 233), transparent);
+            background: radial-gradient(rgb(174, 116, 221), transparent);
             /* background-size: 200% 200%; */
             /* background: linear-gradient(-45deg, #c89bd8 40%, transparent);
             background-size: 300% 300%; */

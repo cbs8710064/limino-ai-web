@@ -71,13 +71,16 @@ export default defineConfig({
       }
     }
   },
+  esbuild: {
+    drop: isProd ? ['console', 'debugger'] : []
+  },
   build: {
     terserOptions: {
       compress: {
         // warnings: false,
-        drop_console: isProd ? true : false,
-        drop_debugger: isProd ? true : false,
-        pure_funcs: ['console.log']
+        // drop_console: isProd ? true : false,
+        // drop_debugger: isProd ? true : false,
+        // pure_funcs: ['console.log','console.warn']
       },
       output: {
         // 去掉注释内容

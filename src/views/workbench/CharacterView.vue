@@ -30,7 +30,7 @@ onMounted(() => {
     eventBus.on('headerNextEvent', () => {
         router.push({ name: 'paragraph' })
     })
-    taskStore.loopTasks(2, 'gen_role')
+    taskStore.handleLoopTaskOnEvent(2, 'gen_role')
 })
 onUnmounted(() => {
     eventBus.off('headerNextEvent')
@@ -50,7 +50,7 @@ const handleCreateCharacter = async () => {
         const { id, idx } = res
         if (id && idx > -1) {
             const res = await updateRoleByPrompt(Number(id), idx, rolePrompt.value)
-            taskStore.loopTasks(2, 'gen_role')
+            taskStore.handleLoopTaskOnEvent(2, 'gen_role')
             if (res.error) {
                 message.warning(t('warnMessage.hasQueueWorking'))
                 return
@@ -70,6 +70,14 @@ const handleChangeStory = (e: StoryItem) => {
     storyListStore.selectRoleByStoryId(Number(id), 0)
     if (e.roles?.roles && e.roles.roles?.length) {
         rolePrompt.value = e.roles.roles[0].prompts
+        const loadingIdx = e.roles.roles.findIndex(ch => ch.process === 1 || ch.process === 2)
+
+        if (loadingIdx > -1) {
+            const itemBox = document.getElementById(`scriptItem${loadingIdx}`)
+            if (itemBox) {
+                itemBox.scrollIntoView({ behavior: 'smooth' })
+            }
+        }
     }
 }
 

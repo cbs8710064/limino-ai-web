@@ -17,7 +17,7 @@ export const service = axios.create({
 // Request interception
 service.interceptors.request.use((config) => {
   const user = localStorage.getItem(uuidKey)
-  config.headers['User'] = user || ''
+  config.headers['User'] = user ? JSON.parse(user).email : ''
   return config
 })
 service.interceptors.response.use(

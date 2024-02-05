@@ -11,10 +11,11 @@ import type { StoryItem } from '../../stores/useStoryListStore';
 import { useStoryListStore } from '../../stores/useStoryListStore';
 import { useRequest } from '../../api/useRequest';
 import { videoPath } from '../../const/index';
-import { Image, Progress } from 'ant-design-vue'
+import { Image, Progress, Popover } from 'ant-design-vue'
 import { useMessage } from '../../hooks/useMessage';
 import { useTaskStore } from '../../stores/useTaskStore';
-
+import { ChildProcess } from 'child_process';
+const listDom = ref()
 const message = useMessage()
 const { t } = useI18n()
 const createStore = useCreateStore()
@@ -27,7 +28,8 @@ const { createVideo, nextFenjing, getTasks } = useRequest()
 const currentVideo = ref({
   url: '',
   status: '',
-  main_video: ''
+  main_video: '',
+  process: null
 })
 
 onMounted(async () => {
@@ -36,7 +38,7 @@ onMounted(async () => {
   eventBus.on('headerNextEvent', (): void => {
     router.push({ name: 'post' })
   })
-  taskStore.loopTasks(2, 'gen_video')
+  taskStore.handleLoopTaskOnEvent(2, 'gen_video')
 
 
 })
@@ -49,18 +51,30 @@ onUnmounted(() => {
 
 
 const handleChangeStory = (e: StoryItem) => {
-  currentVideo.value = { url: '', status: '', main_video: '' }
+
+
+  currentVideo.value = { url: '', status: '', main_video: '', process: null }
   shots.value = []
   storyListStore.setChatSelected(0)
   if (e.description && e.description.chat_process && e.description.chat_process.length && e.description.chat_process[0] && e.description.chat_process[0].videos && e.description.chat_process[0].videos.length) {
     createVideoLoading.value = true
     const { url, status } = e.description.chat_process[0].videos[0]
     const { main_video } = e.description.chat_process[0]
+
     nextTick(() => {
       currentVideo.value = {
         url,
         status,
-        main_video
+        main_video,
+        process: null
+      }
+      const loadingIdx = e.description.chat_process.findIndex(ch => ch.process === 1 || ch.process === 2)
+
+      if (loadingIdx > -1) {
+        const itemBox = document.getElementById(`scriptItem${loadingIdx}`)
+        if (itemBox) {
+          itemBox.scrollIntoView({ behavior: 'smooth' })
+        }
       }
     })
   }
@@ -69,14 +83,13 @@ const handleChangeStory = (e: StoryItem) => {
 }
 
 const handleSelect = (_e: any, idx: number) => {
+
   if (!_e.main_video || _e.main_video !== currentVideo.value.main_video) {
     createVideoLoading.value = true
     nextTick(() => {
       storyListStore.setChatSelected(idx)
-      const v = _e.videos && _e.videos.length ? _e.videos[0] : { url: '', status: '' }
       currentVideo.value = {
-        ...v,
-        main_video: _e.main_video
+        ..._e
       }
       createVideoLoading.value = false
     })
@@ -112,7 +125,9 @@ watch(() => storyListStore.selectedChat, (newVal) => {
     list[shotIdx > -1 ? shotIdx : 0].selected = true
     shots.value = list
     const { chatIdx } = storyListStore.getSelectedIdAndIdx()
-    handleSelect(storyListStore.selectedChat, chatIdx || 0)
+    nextTick(() => {
+      handleSelect(storyListStore.selectedChat, chatIdx || 0)
+    })
   } else {
     shots.value = []
   }
@@ -147,7 +162,7 @@ const handleCreate = async () => {
       const { error } = await createVideo(Number(id), chatIdx, params)
       if (!error) {
         message.success(t('successMessage.createSuccess'))
-        taskStore.loopTasks(2, 'gen_video')
+        taskStore.handleLoopTaskOnEvent(2, 'gen_video')
       } else {
         message.warning(t('warnMessage.hasQueueWorking'))
       }
@@ -184,15 +199,23 @@ const handleGetFenJing = async () => {
       const res = await getFenjingTask()
       if (res.length) {
         message.warning(t('warnMessage.hasFejingQueueWorking'))
+        return
       }
     }
-    await nextFenjing(Number(id), chatIdx)
-    await taskStore.loopTasks(2, 'gen_shots')
-
+    const res = await nextFenjing(Number(id), chatIdx)
+    if (res.error) {
+      message.warning(t('warnMessage.hasQueueWorking'))
+      loadingFenJing.value = false
+      return
+    }
+    taskStore.handleLoopTaskOnEvent(2, 'gen_shots')
   }
 }
-
-const currentChatContent = computed(() => storyListStore.selectedChat && storyListStore.selectedChat.text_en ? storyListStore.selectedChat.text_en : (storyListStore.selectedChat.text || ''))
+const handleOneClickCreate = (_item: any, idx: number) => {
+  storyListStore.setChatSelected(idx)
+  handleCreate()
+}
+const currentChatContent = computed(() => storyListStore.selectedChat && storyListStore.selectedChat?.text_en ? storyListStore.selectedChat?.text_en : (storyListStore.selectedChat?.text || ''))
 </script>
 <template>
   <div class="paragraph-page lg:flex">
@@ -200,19 +223,30 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
       <div class="pb-4 lg:flex">
         <StoryList @change="handleChangeStory" />
         <div class="max-h-37 w-100% lg:max-h-93.2vh">
-          <div class="scrollbar-small-x lg:scrollbar-small-y panel-list max-h-35 px-4 lg:max-h-84vh lg:pl-4 lg:pr-3" v-if="storyListStore.selectedStory?.description?.chat_process && storyListStore.selectedStory?.description?.chat_process.length">
-            <div v-for="(item, idx) in storyListStore.selectedStory?.description?.chat_process" :key="item.id" @click="handleSelect(item, idx)" :class="`panel-item ${item.selected ? 'active' : ''}`">
+          <div class="scrollbar-small-x lg:scrollbar-small-y panel-list max-h-35 px-4 lg:max-h-84vh lg:pl-4 lg:pr-3" id="scriptBox" v-if="storyListStore.selectedStory?.description?.chat_process && storyListStore.selectedStory?.description?.chat_process.length">
+            <div v-for="(item, idx) in storyListStore.selectedStory?.description?.chat_process" :id="`scriptItem${idx}`" :key="item.id" @click="handleSelect(item, idx)" :class="`panel-item ${item.selected ? 'active' : ''}`">
               <div class="flex items-center justify-center h-4" v-if="item.process">
-                <div class="h-4" v-if="item.process === 1 || item.process === 2" :title="t('common.creating')">
-                  <div class="flex justify-center">
+                <div class="h-4" v-if="item.process !== 4" :title="t('common.creating')">
+                  <div class="flex justify-center" v-if="item.process === 1 || item.process === 2">
                     <i class="i-svg-spinners-ring-resize font-size-4 color-#1677ff"></i>
                   </div>
                 </div>
-                <div v-if="item.process === 3" class="left-50% ml--1 rounded-full bg-green w-3 h-3"></div>
+                <div class="absolute bottom-1 flex items-center justify-center rounded-full right-1">
+                  <i class="i-ooui-success color-green" v-if="item.process === 3"></i>
+                </div>
               </div>
               <div>
                 <div class="font-bold">Page{{ idx + 1 }}</div>
-                <div class="line-clamp-4 overflow-hidden text-ellipsis text-left font-size-3 w-30 h-20">{{ item.text }}</div>
+                <div class="line-clamp-4 overflow-hidden text-ellipsis text-left font-size-3 w-30 h-20 lg:w-100%">{{ item.text }}</div>
+
+                <div class="absolute bottom-1 z-10 flex items-center justify-center rounded-full right-1 w-5 h-5" v-if="item.process === undefined && !taskStore.hasVideoTask">
+                  <Popover placement="right">
+                    <template #content> {{ t('common.useScriptCreate') }}</template>
+                    <i class="i-material-symbols-play-circle-rounded font-size-5 color-#1677ff" @click="handleOneClickCreate(item, idx)"></i>
+                  </Popover>
+                </div>
+
+
               </div>
             </div>
           </div>

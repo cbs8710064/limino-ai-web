@@ -1,19 +1,25 @@
 <script setup lang='ts'>
 import TheDropdown from './TheDropdown.vue';
-import { ref, type Ref } from 'vue';
+import { ref, type Ref, reactive } from 'vue';
 import { type DropdownOption } from '../types/components';
 import { useI18n } from 'vue-i18n'
 import { useLanguageStore } from '../stores/useLanguageStore';
 import { languagesList } from '@/const';
 import UserScoreModal from '@/views/workbench/components/UserScoreModal.vue';
 import useScroll from '../hooks/useScroll';
-
+import { useUserStore } from '../stores/useUserStore';
+import router from '../router/index';
+const userStore = useUserStore()
 defineProps<{
   hasBackground?: boolean
 }>()
+
 const languageStore = useLanguageStore()
 const i18n = useI18n()
 const { t } = i18n
+const logoutOpts = reactive([
+  { label: t('login.logout'), value: 1 }
+])
 const langs = ref(languagesList)
 const langData: Ref<DropdownOption> = ref(langs.value.find(item => item.value === languageStore.lang) || langs.value[0])
 const langVal = ref(langData.value.value)
@@ -28,6 +34,11 @@ const handleChange = (e: DropdownOption) => {
 const userScoreModal = ref(false)
 const handleShowScoreModal = () => {
   userScoreModal.value = true
+}
+
+const changeLogout = (e: DropdownOption) => {
+  userStore.loginOut()
+  router.replace({ name: 'home' })
 }
 
 const scrollFlag = ref(false)
@@ -46,11 +57,17 @@ useScroll(({ top }) => {
         <div class="brand-tit font-size-5 color-white font-bold lh-15 lg:font-size-8">{{ t('components.theHeader.companyTit') }}</div>
       </div>
       <div class="flex items-center">
-        <div class="account-scores mr-2 flex cursor-pointer items-center justify-between rounded-full px-2 w-20 h-9 lg:w-28" @click="handleShowScoreModal">
-          <i class="i-mingcute-diamond-2-line font-size-4 color-#9f54ba lg:font-size-6"></i>
-          <span class="font-size-3 font-bold lg:font-size-4.4">1200</span> <i class="i-ic-outline-add font-size-5.4 font-bold"></i>
+        <div class="account-scores mr-2 flex cursor-pointer items-center justify-between rounded-full px-2 w-14 h-9 lg:w-20">
+          <i class="i-mingcute-diamond-2-line font-size-4 color-#9f54ba lg:font-size-6"></i> <span class="font-size-4 font-bold lg:font-size-4.4">{{ userStore.userInfo?.user?.token || 0 }}</span>
+          <!-- <i class="i-ic-outline-add font-size-5.4 font-bold"></i> -->
         </div>
-        <RouterLink :class="`btn font-size-4 ${scrollFlag ? 'color-white' : 'color-black '}`" to="/login">{{ t('components.theHeader.signIn') }}</RouterLink>
+        <TheDropdown v-if="userStore.userInfo && userStore.userInfo.email" :options="logoutOpts" @change="changeLogout">
+          <div class="userIcon flex cursor-pointer items-center justify-center rounded-full bg-white font-size-5 font-bold w-8 h-8">
+            <i class="i-material-symbols-person font-size-6 color-#9f54ba"></i>
+            <!-- {{ userStore.userInfo?.email?.slice(0, 1).toUpperCase() }} -->
+          </div>
+        </TheDropdown>
+        <RouterLink v-else :class="`btn font-size-4 ${scrollFlag ? 'color-white' : 'color-black '}`" to="/login">{{ t('components.theHeader.signIn') }}</RouterLink>
         <TheDropdown :options="langs" class="ml-2" alignDirection="right" @change="handleChange" v-model="langVal">
           <div class="lang flex items-center justify-start rounded-full px-1.2 w-12 h-8">
             <i :class="`${langData.icon} font-size-5 mr-1`"></i>
@@ -85,6 +102,10 @@ useScroll(({ top }) => {
 
 .the-header.tarnsparent .tit {
   color: #fff;
+}
+
+.userIcon:hover {
+  border: 1px solid #9f54ba;
 }
 
 

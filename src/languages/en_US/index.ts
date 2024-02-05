@@ -4,11 +4,13 @@ export default {
     creating: 'Added to the task queue in the process of production...',
     queuing: 'In line',
     hasQueueNum: 'In front of there are {number}',
-    submit: 'Submit'
+    submit: 'Submit',
+    useScriptCreate: 'Use the script to generate a video',
+    useAllScriptCreate: 'Directly generate all videos for all scripts under that story'
   },
 
   home: {
-    title: 'Turn your story into an anime video with LiminoAl.',
+    title: 'Turn your story into an movie with Limino.ai',
     smallTitle:
       'Innovating the process of generating anime videos from text with AI. we aggregate the whole workflow to provide end-to-end AI anime generation services for both B and C sides. This allows anyone to become an anime producer.',
     startBtn: 'Start Creating',
@@ -32,7 +34,8 @@ export default {
     signToGoogle: 'Sign in with Google',
     inputEmail: 'Enter your email address',
     emailTit: 'Fill in your email address to apply for whitelisting',
-    loginIn: 'Login to LiminoAI'
+    loginIn: 'Login to LiminoAI',
+    logout: 'Log out'
   },
   workbench: {
     brandTit: 'LiminoAI',
@@ -93,7 +96,7 @@ export default {
         enterAstory: 'Enter Your Story...',
         placeSeletedData: 'Please select at least one story',
         addContent: 'My story',
-        tip: 'After the completion of the story content input, characters will be automatically created, and segmentation will be done in script format.',
+        tip: 'After the story content is entered, the characters are automatically created and converted into scripts.',
         generateRoleStory: 'Generate characters and scripts',
         generateStolyContent: 'Generate story content'
       },
@@ -147,7 +150,10 @@ export default {
       'You currently have a storyboard generation task running, please try again later',
     noFenjing: 'There is no storyboard data for the script',
     chooseMergeVideos: 'Please select the videos you want to merge',
-    emailError: "The email address doesn't follow the rules"
+    emailError: "The email address doesn't follow the rules",
+    duplicateEmail: 'You have already submitted your application, please be patient',
+    createAllVideoWarn: 'The story is already in the queue, please try again later',
+    pleaseCreateStory: 'Create a story first'
   },
   successMessage: {
     createSuccess: 'It has been submitted to the task queue, please be patient',
@@ -160,7 +166,9 @@ export default {
     mergeSuccess: 'The merge was successful',
     chooseStyle: 'Please select a style',
     emailSuccess: 'An application has been submitted to join the whitelist, please be patient',
-    loginSuccess: 'Login successful'
+    loginSuccess: 'Login successful',
+    createAllVideosSuccess:
+      'All scripts for this story have been added to the generated video queue, please be patient'
   },
   errorMessage: {
     createStoryFailed: 'Failed to create a story',

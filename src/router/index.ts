@@ -20,6 +20,7 @@ const router = createRouter({
     {
       path: '/workbench',
       name: 'workbench',
+      redirect: { name: 'story' },
       component: () => import('@/views/workbench/IndexLayout.vue'),
       children: [
         {

@@ -14,6 +14,9 @@ import { useEventBus } from '../../hooks/useBus';
 import router from '../../router/index';
 import type { NewStoryParams } from '../../types/api';
 import TheTelescoping from '@/components/TheTelescoping.vue';
+import { useTaskStore } from '../../stores/useTaskStore';
+import anime from 'animejs';
+import { type StyleItem } from '../../stores/useStylelistStore';
 
 const { eventBus } = useEventBus()
 const { t } = useI18n()
@@ -21,7 +24,7 @@ const message = useMessage()
 const { newStory } = useRequest()
 const createStore = useCreateStore()
 const storyListStore = useStoryListStore()
-
+const taskStore = useTaskStore()
 const handleAdd = async () => {
     const Form = document.getElementById('Form')
     if (Form) {
@@ -40,22 +43,28 @@ const list: Ref<Array<{
     url: string
     checked: boolean,
     desc: string
+    disabled: boolean
 }>> = ref([{
     id: 'realistic',
     url: img1,
     checked: true,
+    disabled: false,
     desc: t('home.realistic')
 },
 {
     id: 'anime',
     url: img2,
     checked: false,
+    disabled: false,
     desc: t('home.anime')
 }])
 
 const handleChoose = (e: any) => {
     console.log(e)
-    const { id } = e;
+    const { id, disabled } = e;
+    if (disabled) {
+        return
+    }
     list.value.forEach(item => {
         if (item.id === id) {
             item.checked = true
@@ -136,12 +145,10 @@ const handleAddConfirm = async () => {
         await storyListStore.getStoryList()
         if (!res?.task?.error && res.id) {
             eventBus.emit('addStoryEvent', res.id)
-            // router.push({
-            //     name: 'cover'
-            // })
+            taskStore.handleLoopTaskOnEvent(2, 'init_story')
             message.success(t('successMessage.createSuccess'))
         } else {
-            message.error(t('errorMessage.createStoryFailed'))
+            message.warning(t('warnMessage.hasQueueWorking'))
         }
     } finally {
         addStoryLoading.value = false
@@ -150,6 +157,20 @@ const handleAddConfirm = async () => {
 
 watch(() => storyListStore.selectedStory, (n) => {
     newStoryVal.value.text = n?.text || ''
+    if (n) {
+        list.value.forEach((item: StyleItem) => {
+            item.disabled = true
+            if (item.id === n.style) {
+                item.checked = true
+            } else {
+                item.checked = false
+            }
+
+        })
+    } else {
+        list.value.forEach(item => item.disabled = false)
+
+    }
 }, {
     immediate: true,
     deep: true
@@ -194,7 +215,7 @@ onUnmounted(() => {
                             <div class="font-size-3 color-gray lg:font-size-3.3">{{ t('workbench.views.story.iptContent') }}</div>
                             <div class="mt-4 w-100% lg:max-w-100% lg:flex lg:justify-between">
                                 <TheButton class="mb-4 lg:mb-0 lg:w-48%" type="border" @click="handleAddConfirm" :loading="addStoryLoading">{{ t('workbench.views.story.generateRoleStory') }}</TheButton>
-                                <TheButton class="lg:w-48%" type="border">{{ t('workbench.views.story.generateStolyContent') }}</TheButton>
+                                <!-- <TheButton class="lg:w-48%" type="border">{{ t('workbench.views.story.generateStolyContent') }}</TheButton> -->
                             </div>
                         </div>
                     </div>
@@ -279,7 +300,7 @@ onUnmounted(() => {
 
     :deep() {
         .left-box .the-telescoping-box {
-            --at-apply: max-h-50;
+            --at-apply: max-h-53;
 
             .h-100vh {
                 height: 100%;

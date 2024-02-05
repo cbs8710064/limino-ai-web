@@ -1,4 +1,5 @@
 import type {
+  CreateAllVideoByIdParams,
   CreateVideoParams,
   DrawToVideoResponse,
   NewStoryParams,
@@ -34,7 +35,11 @@ function newStory(params: NewStoryParams): Promise<NewStoryResponse> {
  * @returns
  */
 function getStories(): Promise<any> {
-  return service.get('/stories')
+  return service({
+    url: '/stories',
+    method: 'get',
+    timeout: 6000
+  })
 }
 
 /**
@@ -104,7 +109,11 @@ function setMainVideo(id: number, index: number, main_video: string): Promise<an
  * @returns
  */
 function getTasks(status: number = 1) {
-  return service.get(`/tasks?status=${status}`)
+  return service({
+    url: `/tasks?status=${status}`,
+    timeout: 5000,
+    method: 'get'
+  })
 }
 
 /**
@@ -150,8 +159,31 @@ function getScriptsByStoryId(id: number) {
   return service.get(`/stories/${id}/roles`)
 }
 
+/**
+ * home page videos
+ * @returns
+ */
+
 function getIndexList(): Promise<any[]> {
   return service.get('/index')
+}
+
+/**
+ * merger videos by storyId
+ * @param id storyId
+ * @returns
+ */
+function mergerVideosById(id: number) {
+  return service.post(`/stories/${id}/merge_video`)
+}
+
+/**
+ * create all videos by storyId
+ * @param id
+ * @returns
+ */
+function createAllVideoById(id: number, params: CreateAllVideoByIdParams) {
+  return service.post(`/stories/${id}/script_video`, params)
 }
 
 export const useRequest = (): UseRequestReturns => {
@@ -171,6 +203,8 @@ export const useRequest = (): UseRequestReturns => {
     getAllLogs,
     getRolesByStoryId,
     getScriptsByStoryId,
-    getIndexList
+    getIndexList,
+    mergerVideosById,
+    createAllVideoById
   }
 }

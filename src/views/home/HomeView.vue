@@ -8,10 +8,16 @@ import TheTabs from '@/components/TheTabs.vue';
 import TheTabLibrary from '@/views/home/components/TheTabLibrary.vue'
 import TheFooter from '@/components/TheFooter.vue';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '../../stores/useUserStore';
+const userStore = useUserStore()
 const { t } = useI18n()
 const addModal = ref(false)
 const router = useRouter()
 const handleAdd = () => {
+  if (!userStore.userInfo?.email) {
+    router.push({ name: 'login' })
+    return
+  }
   // addModal.value = true
   router.replace({
     name: 'story'
@@ -26,15 +32,15 @@ const handleAdd = () => {
 
   <div class="home-view pt-30">
     <div class="w-100% px-4 lg:px-10">
-      <div class="max-w-100%">
-        <div class="lg:max-w-55vw">
-          <div class="big-desc max-w-100% text-center font-size-5 font-bold lh-6 lg:max-w-220 lg:text-left lg:font-size-8 lg:lh-14">{{ t('home.title') }}</div>
-          <div class="small-desc mt-14 max-w-100% text-center font-size-3.5 lh-5 lg:mt-8 lg:max-w-100 lg:text-left lg:font-size-4">{{ t('home.smallTitle') }}
-          </div>
+      <div class="max-w-100% flex justify-center">
+        <div class="w-100%">
+          <div class="big-desc max-w-100% text-center font-size-5 font-bold lh-6 lg:font-size-8 lg:lh-14">{{ t('home.title') }}</div>
+          <!-- <div class="small-desc mt-14 max-w-100% text-center font-size-3.5 lh-5 lg:mt-8 lg:max-w-100 lg:text-left lg:font-size-4">{{ t('home.smallTitle') }}
+          </div> -->
         </div>
         <div></div>
       </div>
-      <div>
+      <div class="mt-10 lg:mt-30">
         <div class="mt-10 flex items-center justify-center lg:mt--10">
           <div @click="handleAdd" class="create-btn">{{ t('home.startBtn') }}</div>
         </div>
@@ -49,7 +55,7 @@ const handleAdd = () => {
 
         </div>
       </div>
-      <TheFooter />
+      <!-- <TheFooter /> -->
     </div>
 
 
@@ -90,6 +96,7 @@ const handleAdd = () => {
 
 .big-desc {
   color: #fff;
+  text-shadow: 2px 4px 8px rgb(53, 52, 52);
 }
 
 .small-desc {

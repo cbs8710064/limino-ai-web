@@ -13,6 +13,7 @@ type TypeIds = {
 const { eventBus } = useEventBus()
 export type StoryChildrenItem = StoryItem | CharacterItem | ArticleItem
 export type StoryItem = {
+  video: string
   description: {
     chat_process: any[]
   }
@@ -29,6 +30,7 @@ export type StoryItem = {
   children: Array<StoryChildrenItem>
   cover?: string
   ready?: boolean
+  hasTask?: boolean
 }
 export type VideoItem = {
   id: number
@@ -59,8 +61,6 @@ export type MergeList = Array<{
 const idsKey = 'ids'
 const { getStories, deleteStory, getTasks } = useRequest()
 const newIds = getIds()
-
-localStorage.removeItem(idsKey)
 // Solve the problem of reassigning selected to true during rotation
 export const ids: TypeIds = newIds || {
   storyIdx: 0,
@@ -68,6 +68,7 @@ export const ids: TypeIds = newIds || {
   roleIdx: 0,
   shotIdx: 0
 }
+localStorage.removeItem(idsKey)
 // 用于同步任务队列结束后刷新页面保存刷新前列表选中的值
 export function setIds(v: TypeIds | null) {
   if (v) {
@@ -84,119 +85,119 @@ export function getIds() {
 let flag = false
 export const useStoryListStore = defineStore('storyList', () => {
   const list: Ref<StoryList> = ref([])
-
+  const tasksList = ref([])
   // get list from internet
   // 通过接口同步状态数据
   async function getStoryList() {
-    const res = await getStories()
-    const tasks = await getTasks(4)
+    let res = await getStories()
+    const tasks = await getTasks(3)
+    eventBus.emit('loopTaskEvent', tasks)
+    tasksList.value = tasks
     const genvideoTasks = tasks.filter(
       (it: { func: string; status: number }) => it.status !== 4 && it.func === 'gen_video'
     )
     if (res && res.length) {
-      const { chatIdx, roleIdx, shotIdx } = ids
-      res.forEach(
-        (item: {
-          id: any
-          main_video: any
-          language: any
-          roles: any
-          description: any
-          selected: boolean
-        }) => {
-          // item.selected = false
-          if (item?.roles && item.roles?.roles && item.roles.roles?.length) {
-            item.roles.roles.forEach(
-              (
-                role: {
-                  name_en: any
-                  name: any
-                  text: any
-                  selected: boolean
-                },
-                idx: number
-              ) => {
-                const nowRoleIdx = roleIdx > -1 ? roleIdx : 0
-                if (idx === nowRoleIdx) {
-                  ids.roleIdx = nowRoleIdx
-                  role.selected = true
-                } else {
-                  role.selected = false
-                }
-              }
-            )
+      res = res.sort((a: StoryItem, b: StoryItem) => b.id - a.id)
+      const { chatIdx, roleIdx, shotIdx, storyIdx } = ids
+      res.forEach((item: StoryItem) => {
+        const val = genvideoTasks.filter((d: any) => {
+          if (d.args[0] === item.id && (d.status === 1 || d.status === 2 || d.status === 3)) {
+            return d
           }
-          if (item.description && item.description.chat_process.length) {
-            const nowChatIdx = chatIdx > -1 ? chatIdx : 0
-            item.description.chat_process.forEach(
-              (
-                child: {
-                  [x: string]: any
-                  main_video: any
-                  text: any
-                  text_en: any
-                  totalVideos: any
-                  process: any
-                  videos: any
-                  shots: any[]
-                  selected: boolean
-                },
-                idx: number
-              ) => {
-                child.text = child.text_en || child.text
+        })
+        if (val.length) {
+          item.hasTask = true
+        }
+        // item.selected = false
+        if (item?.roles && item.roles?.roles && item.roles.roles?.length) {
+          item.roles.roles.forEach(
+            (
+              role: {
+                name_en: any
+                name: any
+                text: any
+                selected: boolean
+              },
+              idx: number
+            ) => {
+              const nowRoleIdx = roleIdx > -1 ? roleIdx : 0
+              if (idx === nowRoleIdx) {
+                ids.roleIdx = nowRoleIdx
+                role.selected = true
+              } else {
+                role.selected = false
+              }
+            }
+          )
+        }
+        if (item.description && item.description.chat_process.length) {
+          const nowChatIdx = chatIdx > -1 ? chatIdx : 0
+          item.description.chat_process.forEach(
+            (
+              child: {
+                [x: string]: any
+                main_video: any
+                text: any
+                text_en: any
+                totalVideos: any
+                process: any
+                videos: any
+                shots: any[]
+                selected: boolean
+              },
+              idx: number
+            ) => {
+              child.text = child.text_en || child.text
 
-                // 处理故事选中数据
-                if (idx === nowChatIdx) {
-                  child.selected = true
-                  // 处理分镜
-                  if (child.shots && child.shots.length) {
-                    const shotList = [...child.shots]
-                    const nowShotIdx = shotIdx > -1 ? shotIdx : 0
-                    child.shots = shotList.map((url, idx) => {
-                      if (idx === nowShotIdx) {
-                        return {
-                          url,
-                          idx,
-                          selected: true
-                        }
-                      } else {
-                        return {
-                          url,
-                          idx,
-                          selected: false
-                        }
+              // 处理故事选中数据
+              if (idx === nowChatIdx) {
+                child.selected = true
+                // 处理分镜
+                if (child.shots && child.shots.length) {
+                  const shotList = [...child.shots]
+                  const nowShotIdx = shotIdx > -1 ? shotIdx : 0
+                  child.shots = shotList.map((url, idx) => {
+                    if (idx === nowShotIdx) {
+                      return {
+                        url,
+                        idx,
+                        selected: true
                       }
-                    })
-                  }
-                } else {
-                  child.selected = false
-                }
-
-                if (child?.videos && child.videos.length) {
-                  const [v] = child.videos
-                  v.chatIdx = idx
-                  child.main_video = v.url
-                  child.process = 3
-                  child.status = 3
-                  child.totalVideos = 1
-                } else {
-                  genvideoTasks.forEach((c: any) => {
-                    const { args, status, percent } = c
-                    const [id, chatIdx] = args
-
-                    if (item.id === id && chatIdx === idx) {
-                      child.status = status
-                      child.process = status
-                      child.chatIdx = chatIdx
+                    } else {
+                      return {
+                        url,
+                        idx,
+                        selected: false
+                      }
                     }
                   })
-                  child.totalVideos = child.videos.length
                 }
+              } else {
+                child.selected = false
               }
-            )
-          }
+              child.totalVideos = child.videos.length
+
+              if (child?.videos && child.videos.length) {
+                const [v] = child.videos
+                v.chatIdx = idx
+                child.main_video = v.url
+              }
+
+              if (val && val.length) {
+                val.forEach((c: any) => {
+                  const { args, status, percent } = c
+                  const [id, chatIdx] = args
+                  if (item.id === id && chatIdx === idx) {
+                    child.status = status
+                    child.process = status
+                    child.chatIdx = chatIdx
+                  }
+                })
+              }
+            }
+          )
         }
-      )
+      })
       if (res && res.length) {
         const storyId = list.value.findIndex((it) => it.selected)
         if (storyId && storyId > -1) {
@@ -207,7 +208,7 @@ export const useStoryListStore = defineStore('storyList', () => {
           })
         } else {
           if (ids.storyIdx > -1) {
-            res[0].selected = true
+            res[ids?.storyIdx || 0].selected = true
           }
         }
       }
@@ -386,8 +387,29 @@ export const useStoryListStore = defineStore('storyList', () => {
     return []
   }
 
+  // 当前故事是否有任务队列
+  const selectedStoryHasTask = computed(() => {
+    if (!selectedStory.value) {
+      return false
+    } else {
+      if (selectedStory.value.description && selectedStory.value.description.chat_process.length) {
+        let flag = false
+        selectedStory.value.description.chat_process.some((c) => {
+          if (c.process === 1 || c.process === 2) {
+            flag = true
+            return
+          }
+        })
+        return flag
+      } else {
+        return false
+      }
+    }
+  })
+
   return {
     list,
+    tasksList,
     selectedStory,
     getStoryList,
     setStorySelected,
@@ -400,6 +422,7 @@ export const useStoryListStore = defineStore('storyList', () => {
     setChatSelected,
     selectedChat,
     selectStoryHasVideo,
-    getMainVideoList
+    getMainVideoList,
+    selectedStoryHasTask
   }
 })

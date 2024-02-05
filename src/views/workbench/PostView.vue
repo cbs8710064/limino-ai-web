@@ -8,9 +8,11 @@ import { useI18n } from 'vue-i18n';
 import StoryList from '@/views/workbench/components/StoryList.vue'
 import { useStoryListStore } from '../../stores/useStoryListStore';
 import TheNoData from '@/components/TheNoData.vue';
-import { Image } from 'ant-design-vue'
+import { Image, message } from 'ant-design-vue';
 import { videoPath } from '../../const/index';
-
+import { useRequest } from '../../api/useRequest';
+import { useTaskStore } from '../../stores/useTaskStore';
+const { mergerVideosById } = useRequest()
 const currentLoading = ref(false)
 const { t } = useI18n()
 type VideoItem = {
@@ -22,7 +24,7 @@ type VideoItem = {
 }
 const createStore = useCreateStore()
 const storyListStore = useStoryListStore()
-
+const taskStore = useTaskStore()
 const currentVideo: any = ref({ url: '' })
 const currentUrl: Ref<string> = ref('')
 
@@ -124,9 +126,30 @@ const handleChangeStory = () => {
 }
 
 const mergeLoading = ref(false)
-const handleMerge = () => {
-    // TODO send request for merge videos
-    FileSaver.saveAs(videoPath + '/' + currentVideo.value.url, `${new Date().getTime()}.mp4`);
+const handleMerge = async () => {
+
+    if (storyListStore.selectedStory?.id) {
+        mergeLoading.value = true
+        try {
+            const res = await mergerVideosById(storyListStore.selectedStory.id)
+            if (res.error) {
+                message.warn(t('warnMessage.hasQueueWorking'))
+                return
+            }
+            await taskStore.handleLoopTaskOnEvent(2, 'gen_merged_video')
+            await storyListStore.getStoryList()
+            if (storyListStore.selectedStory.video) {
+                FileSaver.saveAs(videoPath + '/' + storyListStore.selectedStory.video, `${new Date().getTime()}.mp4`);
+            } else {
+                message.error('No video path found')
+            }
+        } catch (err) {
+            message.error(JSON.stringify(err))
+        } finally {
+            mergeLoading.value = false
+        }
+
+    }
 }
 
 </script>

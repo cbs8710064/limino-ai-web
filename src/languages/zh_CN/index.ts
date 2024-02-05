@@ -4,11 +4,13 @@ export default {
     creating: '已加入任务队列制作中...',
     queuing: '排队中',
     hasQueueNum: '还有{number}位',
-    submit: '提交'
+    submit: '提交',
+    useScriptCreate: '使用该剧本生成视频',
+    useAllScriptCreate: '直接生成该故事下所有剧本的所有视频'
   },
 
   home: {
-    title: '使用LiminoAl将您的故事变成动漫视频。',
+    title: '使用Limino.ai将您的故事变成影片。',
     smallTitle:
       '创新使用 AI 从文本生成动漫视频的过程。我们聚合整个工作流程，为B方和C方提供端到端的AI动漫生成服务。这使任何人都可以成为动漫制作人。',
     startBtn: '开始创作',
@@ -32,7 +34,8 @@ export default {
     signToGoogle: '使用谷歌账户登录',
     inputEmail: '输入您的邮箱地址',
     emailTit: '填写邮箱地址申请加入白名单',
-    loginIn: '登录到 LiminoAI'
+    loginIn: '登录到 LiminoAI',
+    logout: '登出'
   },
   workbench: {
     brandTit: 'limino.ai',
@@ -92,7 +95,7 @@ export default {
         enterAstory: '输入你的故事...',
         placeSeletedData: '请选择一个故事',
         addContent: '添加内容',
-        tip: '故事内容录入完成后，会自动创建角色，并以脚本形式进行分割。',
+        tip: '故事内容录入完成后，会自动创建角色，并转换为剧本。',
         generateRoleStory: '生成角色与剧本',
         generateStolyContent: '生成故事内容'
       },
@@ -145,7 +148,10 @@ export default {
     hasFejingQueueWorking: '您当前有分镜生成任务正在运行，请稍后再试',
     noFenjing: '该剧本没有分镜数据',
     chooseMergeVideos: '请选择要合并的视频',
-    emailError: '邮箱地址不符合规则'
+    emailError: '邮箱地址不符合规则',
+    duplicateEmail: '您已提交过申请，请耐心等待',
+    createAllVideoWarn: '该故事已在队列中，请稍后再试',
+    pleaseCreateStory: '请先创建故事'
   },
   successMessage: {
     createSuccess: '已经提交到任务队列，请耐心等待',
@@ -156,7 +162,8 @@ export default {
     mergeSuccess: '合并成功',
     chooseStyle: '请选择风格',
     emailSuccess: '已提交申请加入白名单，请耐心等待',
-    loginSuccess: '登录成功'
+    loginSuccess: '登录成功',
+    createAllVideosSuccess: '该故事的所有剧本已加入生成视频队列，请耐心等待'
   },
   errorMessage: {
     createStoryFailed: '创建故事失败',

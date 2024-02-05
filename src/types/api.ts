@@ -15,7 +15,11 @@ export type UseRequestReturns = {
   getRolesByStoryId: (id: number) => Promise<any>
   getScriptsByStoryId: (id: number) => Promise<any>
   getIndexList: () => Promise<any[]>
+  mergerVideosById: (id: number) => Promise<any>
+  createAllVideoById: (id: number, params: CreateAllVideoByIdParams) => Promise<any>
 }
+
+export type CreateAllVideoByIdParams = { index: number; auto_next: boolean }
 
 export type CreateVideoParams = {
   main_shot?: string
