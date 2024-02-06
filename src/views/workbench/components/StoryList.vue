@@ -60,11 +60,15 @@ const handleAllCreate = async (e: StoryItem) => {
         storyListStore.setStorySelected(e.id)
     }
     if (storyListStore.selectedStory?.id) {
-        const res = await createAllVideoById(storyListStore.selectedStory.id, { index: 0, auto_next: true })
-        if (!res.error) {
-            message.success(t('successMessage.createAllVideosSuccess'))
-        } else {
-            message.warning(t('warnMessage.createAllVideoWarn'))
+        try {
+            const res = await createAllVideoById(storyListStore.selectedStory.id, { index: 0, auto_next: true })
+            if (!res.error) {
+                message.success(t('successMessage.createAllVideosSuccess'))
+            } else {
+                message.warning(t('warnMessage.createAllVideoWarn'))
+            }
+        } catch (err) {
+            message.error(JSON.stringify(err))
         }
     }
 }

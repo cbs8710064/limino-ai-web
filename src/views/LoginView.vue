@@ -106,8 +106,8 @@ const hasClicked = ref(false)
           </div>
         </div>
         <div v-else>
-          <div class="mt-2 px-4 text-center" v-if="submitInfo?.exist">{{ t('successMessage.emailSuccess') }}</div>
-          <div class="mt-2 px-4 text-center" v-else>{{ t('warnMessage.duplicateEmail') }}</div>
+          <div class="mt-2 text-center" v-if="submitInfo?.exist">{{ t('successMessage.emailSuccess') }}</div>
+          <div class="mt-2 text-center" v-else>{{ t('warnMessage.duplicateEmail') }}</div>
         </div>
       </div>
     </div>

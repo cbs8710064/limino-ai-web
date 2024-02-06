@@ -9,6 +9,7 @@ import { onMounted, onUnmounted, watch } from 'vue';
 import { onBeforeRouteUpdate } from 'vue-router';
 import { useUserStore } from '../../stores/useUserStore';
 import router from '../../router/index';
+import { version } from '../../const/index';
 const userStore = useUserStore()
 const createStore = useCreateStore()
 const storyListStore = useStoryListStore()
@@ -63,6 +64,7 @@ onBeforeRouteUpdate(() => {
       <RouterView />
     </div>
   </div>
+  <div class="mt-2 block bg-transparent pb-2 text-center color-#ccc">v{{ version }}</div>
 </template>
 <style scoped lang='scss'>
 .index-layout-right {

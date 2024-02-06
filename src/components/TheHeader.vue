@@ -57,7 +57,7 @@ useScroll(({ top }) => {
         <div class="brand-tit font-size-5 color-white font-bold lh-15 lg:font-size-8">{{ t('components.theHeader.companyTit') }}</div>
       </div>
       <div class="flex items-center">
-        <div class="account-scores mr-2 flex cursor-pointer items-center justify-between rounded-full px-2 w-14 h-9 lg:w-20">
+        <div class="account-scores mr-2 flex cursor-pointer items-center justify-between rounded-full px-2 w-14 h-9 lg:w-16 lg:h-8">
           <i class="i-mingcute-diamond-2-line font-size-4 color-#9f54ba lg:font-size-6"></i> <span class="font-size-4 font-bold lg:font-size-4.4">{{ userStore.userInfo?.user?.token || 0 }}</span>
           <!-- <i class="i-ic-outline-add font-size-5.4 font-bold"></i> -->
         </div>

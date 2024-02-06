@@ -129,21 +129,25 @@ export const useTaskStore = defineStore('taskStore', () => {
   const handleLoopTaskOnEvent = async (taskStatus: number = 2, type: TaskType) => {
     eventBus.off('loopTaskEvent')
     return new Promise((resolve, reject) => {
-      handleTask(taskStatus, type).then(() => {
-        eventBus.on('loopTaskEvent', async (list) => {
-          try {
-            await handleTaskData(type, taskStatus, list)
-          } catch (err: any) {
-            resolve(true)
-            if (type === 'gen_cover' || type === 'gen_role' || type === 'gen_shots') {
-              if (ids) {
-                setIds(ids)
+      handleTask(taskStatus, type)
+        .then(() => {
+          eventBus.on('loopTaskEvent', async (list) => {
+            try {
+              await handleTaskData(type, taskStatus, list)
+            } catch (err: any) {
+              resolve(true)
+              if (type === 'gen_cover' || type === 'gen_role' || type === 'gen_shots') {
+                if (ids) {
+                  setIds(ids)
+                }
+                location.reload()
               }
-              location.reload()
             }
-          }
+          })
         })
-      })
+        .catch((err) => {
+          resolve(true)
+        })
     })
   }
   return {

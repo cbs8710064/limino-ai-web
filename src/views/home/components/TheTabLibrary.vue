@@ -107,15 +107,15 @@ watch(() => showVideo.value, (n) => {
 </template>
 <style scoped lang='scss'>
 .videoEle::-webkit-media-controls {
-  display: none !important;
+  /* display: none !important; */
 }
 
 .videoEle::-webkit-media-controls-enclosure {
-  display: none !important;
+  /* display: none !important; */
 }
 
 .story-card {
-  --at-apply: w-47% lg:w-23% h-70 lg:h-58 rounded-1 flex justify-center items-center mx-1.1 lg:mx-1% mb-2 lg:mb-5 cursor-pointer relative overflow-hidden;
+  --at-apply: w-47% lg:w-23% h-70 lg:h-58 rounded-1 flex justify-center items-center mx-0 lg:mx-1% mb-2 lg:mb-5 cursor-pointer relative overflow-hidden;
   border: 1px solid #ccc;
   width: 100%;
   background-size: 200%;

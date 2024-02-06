@@ -14,8 +14,6 @@ import { videoPath } from '../../const/index';
 import { Image, Progress, Popover } from 'ant-design-vue'
 import { useMessage } from '../../hooks/useMessage';
 import { useTaskStore } from '../../stores/useTaskStore';
-import { ChildProcess } from 'child_process';
-const listDom = ref()
 const message = useMessage()
 const { t } = useI18n()
 const createStore = useCreateStore()
@@ -56,20 +54,24 @@ const handleChangeStory = (e: StoryItem) => {
   currentVideo.value = { url: '', status: '', main_video: '', process: null }
   shots.value = []
   storyListStore.setChatSelected(0)
-  if (e.description && e.description.chat_process && e.description.chat_process.length && e.description.chat_process[0] && e.description.chat_process[0].videos && e.description.chat_process[0].videos.length) {
+
+  if (e.description && e.description.chat_process && e.description.chat_process.length && e.description.chat_process[0]) {
     createVideoLoading.value = true
-    const { url, status } = e.description.chat_process[0].videos[0]
-    const { main_video } = e.description.chat_process[0]
+    if (e.description.chat_process[0].videos && e.description.chat_process[0].videos.length) {
+      const { url, status } = e.description.chat_process[0].videos[0]
+      const { main_video } = e.description.chat_process[0]
+      nextTick(() => {
+        currentVideo.value = {
+          url,
+          status,
+          main_video,
+          process: null
+        }
+      })
+    }
 
     nextTick(() => {
-      currentVideo.value = {
-        url,
-        status,
-        main_video,
-        process: null
-      }
       const loadingIdx = e.description.chat_process.findIndex(ch => ch.process === 1 || ch.process === 2)
-
       if (loadingIdx > -1) {
         const itemBox = document.getElementById(`scriptItem${loadingIdx}`)
         if (itemBox) {
@@ -79,11 +81,9 @@ const handleChangeStory = (e: StoryItem) => {
     })
   }
   createVideoLoading.value = false
-
 }
 
 const handleSelect = (_e: any, idx: number) => {
-
   if (!_e.main_video || _e.main_video !== currentVideo.value.main_video) {
     createVideoLoading.value = true
     nextTick(() => {
@@ -160,9 +160,11 @@ const handleCreate = async () => {
     const { id, chatIdx } = storyListStore.getSelectedIdAndIdx()
     if (id && chatIdx > -1) {
       const { error } = await createVideo(Number(id), chatIdx, params)
+      createVideoLoading.value = false
+      taskStore.handleLoopTaskOnEvent(2, 'gen_video')
       if (!error) {
         message.success(t('successMessage.createSuccess'))
-        taskStore.handleLoopTaskOnEvent(2, 'gen_video')
+
       } else {
         message.warning(t('warnMessage.hasQueueWorking'))
       }
@@ -220,9 +222,9 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
 <template>
   <div class="paragraph-page lg:flex">
     <TheTelescoping width="380px" direction="right" class="ipt-box">
-      <div class="pb-4 lg:flex">
+      <div class="lg:flex">
         <StoryList @change="handleChangeStory" />
-        <div class="max-h-37 w-100% lg:max-h-93.2vh">
+        <div class="max-h-40 w-100% lg:max-h-93.2vh">
           <div class="scrollbar-small-x lg:scrollbar-small-y panel-list max-h-35 px-4 lg:max-h-84vh lg:pl-4 lg:pr-3" id="scriptBox" v-if="storyListStore.selectedStory?.description?.chat_process && storyListStore.selectedStory?.description?.chat_process.length">
             <div v-for="(item, idx) in storyListStore.selectedStory?.description?.chat_process" :id="`scriptItem${idx}`" :key="item.id" @click="handleSelect(item, idx)" :class="`panel-item ${item.selected ? 'active' : ''}`">
               <div class="flex items-center justify-center h-4" v-if="item.process">
@@ -245,8 +247,6 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
                     <i class="i-material-symbols-play-circle-rounded font-size-5 color-#1677ff" @click="handleOneClickCreate(item, idx)"></i>
                   </Popover>
                 </div>
-
-
               </div>
             </div>
           </div>
@@ -260,26 +260,46 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
     <div class="con scrollbar-small-y min-h-60 w-100% px-4 lg:h-93.3vh lg:min-h-50vh lg:px-10">
       <div class="h-100% flex items-center items-center justify-center py-4 lg:py-10">
         <div class="relative max-w-240 min-h-60 w-100% bg-white p-4 rounded-1 lg:min-h-140">
-          <div class="h-100% w-100% flex items-center justify-center" v-if="createVideoLoading">
+          <div class="min-h-50 w-100% flex items-center justify-center lg:min-h-120" v-if="createVideoLoading">
             <i class="i-svg-spinners-ring-resize font-size-16"></i>
           </div>
-          <div v-else class="w-100% flex items-center justify-center">
-            <div v-if="currentVideo.url" class="w-100%">
+          <div v-if="!createVideoLoading" class="w-100% flex items-center justify-center">
+            <div v-if="currentVideo.url && !taskStore.tasks.gen_video" class="w-100%">
               <div class="relative">
                 <video class="z-140 w-100% bg-#ccc object-cover rounded-1" controls playsinline>
                   <source :src="`${videoPath}/${currentVideo.main_video}`" type="video/mp4">
                 </video>
               </div>
             </div>
-          </div>
-          <div v-if="!createVideoLoading && !currentVideo.url" class="flex items-center justify-center h-50 lg:h-140">
-            <div v-if="!taskStore.tasks.gen_video">
-              <div class="flex justify-center">
-                <i class="i-icon-park-solid-charging-treasure font-size-14 color-#ccc lg:font-size-20"></i>
+            <div v-if="currentVideo.url && taskStore.tasks.gen_video">
+              <div class="min-h-50 flex items-center justify-center lg:min-h-120">
+                <div class="relative">
+                  <video class="z-140 w-100% bg-#ccc object-cover rounded-1" controls playsinline>
+                    <source :src="`${videoPath}/${currentVideo.main_video}`" type="video/mp4">
+                  </video>
+                </div>
+                <!-- <Progress v-else type="circle" :percent="taskStore.tasks?.gen_video?.percent" :size="200">
+                  <template #format>
+                    <div>
+                      <div class="font-size-4 color-#9f54ba" v-if="taskStore.tasks.gen_video.status === 1">
+                        <div class="mb-2 text-center font-size-7 font-bold">0%</div>
+                        <div class="flex items-center justify-center">
+                          <i class="i-fluent-people-queue-24-filled font-size-7"></i>
+                          <span class="font-size-5 font-bold">{{ taskStore.tasks.gen_video.queue }}</span>
+                        </div>
+                      </div>
+                      <div v-else class="text-center font-size-7 font-bold">{{ taskStore.tasks.gen_video.percent }}%</div>
+                    </div>
+                  </template>
+                </Progress> -->
               </div>
-              <div class="mt-4 text-center color-#ccc">{{ t('workbench.components.noVideo') }}</div>
+
+
             </div>
-            <div v-else>
+          </div>
+          <div v-if="!createVideoLoading && !currentVideo.url && taskStore.tasks.gen_video" class="min-h-50 flex items-center justify-center lg:min-h-120">
+
+            <div>
               <Progress type="circle" :percent="taskStore.tasks.gen_video.percent" :size="200">
                 <template #format>
                   <div>
@@ -296,7 +316,15 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
               </Progress>
             </div>
           </div>
-          <div class="mt-4 flex items-center justify-center" v-if="!taskStore.hasVideoTask && storyListStore.selectedChat?.text">
+          <div v-if="!createVideoLoading && !currentVideo.url && !taskStore.tasks.gen_video" class="min-h-50 flex items-center justify-center lg:min-h-120">
+            <div>
+              <div class="flex justify-center">
+                <i class="i-icon-park-solid-charging-treasure font-size-14 color-#ccc lg:font-size-20"></i>
+              </div>
+              <div class="mt-4 text-center color-#ccc">{{ t('workbench.components.noVideo') }}</div>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-center" v-if="storyListStore.selectedChat?.text">
             <TheButton type="border" class-name="font-size-3 mr-4" @click="handleCreate" :loading="createVideoLoading">{{ currentVideo.main_video ? t('workbench.views.recreateVideo') : t('workbench.views.createVideo') }}</TheButton>
           </div>
         </div>
@@ -408,7 +436,7 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
     }
 
     .ipt-box .the-telescoping-box {
-      --at-apply: max-h-85;
+      --at-apply: max-h-95;
 
       .h-100vh {
         height: 100%;

@@ -79,26 +79,26 @@ const newStoryVal: Ref<NewStoryParams> = ref({
     style: '',
     text: ''
 })
-const checkStoryData = () => {
-    const obj: any = unref(newStoryVal)
-    const selectStyle = list.value.find(item => item.checked)
-    if (!obj.name) {
-        message.warning(t('warnMessage.enterStoryAuthor'))
-        return false
-    }
-    if (!obj.author) {
-        message.warning(t('warnMessage.enterStoryName'))
-        return false
-    }
-    if (selectStyle) {
-        obj.style = selectStyle.id
-    } else {
-        message.warning(t('warnMessage.chooseStyle'))
-        return false
-    }
-    return true
+// const checkStoryData = () => {
+//     const obj: any = unref(newStoryVal)
+//     const selectStyle = list.value.find(item => item.checked)
+//     // if (!obj.name) {
+//     //     message.warning(t('warnMessage.enterStoryAuthor'))
+//     //     return false
+//     // }
+//     if (!obj.author) {
+//         message.warning(t('warnMessage.enterStoryName'))
+//         return false
+//     }
+//     if (selectStyle) {
+//         obj.style = selectStyle.id
+//     } else {
+//         message.warning(t('warnMessage.chooseStyle'))
+//         return false
+//     }
+//     return true
 
-}
+// }
 
 const handleStoryChange = (e: StoryItem) => {
     if (!e.name || !e.author) {
@@ -111,13 +111,13 @@ const handleStoryChange = (e: StoryItem) => {
 onMounted(() => {
     storyListStore.getStoryList()
 
-    eventBus.on('headerNextEvent', () => {
-        const flag = checkStoryData()
-        if (flag) {
-            storyListStore.updateContentByStory(newStoryVal.value.text)
-            router.push({ name: 'character' })
-        }
-    })
+    // eventBus.on('headerNextEvent', () => {
+    //     const flag = checkStoryData()
+    //     if (flag) {
+    //         storyListStore.updateContentByStory(newStoryVal.value.text)
+    //         router.push({ name: 'character' })
+    //     }
+    // })
     createStore.setStep(1)
 
 })

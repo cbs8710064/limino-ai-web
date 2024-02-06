@@ -49,7 +49,7 @@ onMounted(() => {
 }
 
 .the-telescoping {
-    transition: all ease .5s;
+    transition: all ease .4s;
     background: #fff;
 }
 

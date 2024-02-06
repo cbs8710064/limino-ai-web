@@ -1,7 +1,9 @@
 // @unocss-include
+
+export const version = '1.0.0'
+
 export const uuidKey = 'user-id'
 export const videoPath = import.meta.env.VITE_APP_APIPATH
-console.warn('import.meta.env', import.meta.env)
 export const langKey = 'local-lang'
 export const downloadVideoPath = import.meta.env.VITE_APP_VIDEOPATH
 export const languagesList = [

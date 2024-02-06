@@ -105,7 +105,7 @@ export const useStoryListStore = defineStore('storyList', () => {
             return d
           }
         })
-        if (val.length) {
+        if (val.filter((d: any) => d.status === 1 || d.status === 2).length) {
           item.hasTask = true
         }
         // item.selected = false
@@ -176,23 +176,32 @@ export const useStoryListStore = defineStore('storyList', () => {
                 child.selected = false
               }
               child.totalVideos = child.videos.length
-
+              const taskRuns: any = val.filter((ch: any) => {
+                const [id, chatIdx] = ch.args
+                if (ch.status <= 2 && item.id === id && chatIdx === idx) {
+                  return ch
+                }
+              })
               if (child?.videos && child.videos.length) {
                 const [v] = child.videos
                 v.chatIdx = idx
                 child.main_video = v.url
-              }
 
-              if (val && val.length) {
-                val.forEach((c: any) => {
-                  const { args, status, percent } = c
-                  const [id, chatIdx] = args
-                  if (item.id === id && chatIdx === idx) {
-                    child.status = status
-                    child.process = status
-                    child.chatIdx = chatIdx
-                  }
-                })
+                const status = taskRuns.length ? 2 : 3
+                child.process = status
+                child.status = status
+              } else {
+                if (val && val.length) {
+                  val.forEach((c: any) => {
+                    const { args, status, percent } = c
+                    const [id, chatIdx] = args
+                    if (item.id === id && chatIdx === idx) {
+                      child.status = status
+                      child.process = status
+                      child.chatIdx = chatIdx
+                    }
+                  })
+                }
               }
             }
           )

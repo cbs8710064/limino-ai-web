@@ -104,7 +104,7 @@ watch(() => storyListStore.selectStoryRole, n => {
 
 </script>
 <template>
-    <div class="roles-page h-93.5vh lg:flex">
+    <div class="roles-page lg:h-93.5vh lg:flex">
         <TheTelescoping direction="right" width="380px" class="left-box">
             <div class="h-auto pb-2 lg:h-100vh lg:flex lg:pb-0">
                 <StoryList @change="handleChangeStory" />

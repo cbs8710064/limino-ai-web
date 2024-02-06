@@ -9,6 +9,7 @@ import TheTabLibrary from '@/views/home/components/TheTabLibrary.vue'
 import TheFooter from '@/components/TheFooter.vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../../stores/useUserStore';
+import { version } from '../../const/index';
 const userStore = useUserStore()
 const { t } = useI18n()
 const addModal = ref(false)
@@ -56,6 +57,8 @@ const handleAdd = () => {
         </div>
       </div>
       <!-- <TheFooter /> -->
+      <div class="mt-10 block bg-transparent pb-2 text-center color-#ccc">v{{ version }}</div>
+
     </div>
 
 

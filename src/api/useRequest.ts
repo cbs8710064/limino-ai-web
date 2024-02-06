@@ -111,7 +111,7 @@ function setMainVideo(id: number, index: number, main_video: string): Promise<an
 function getTasks(status: number = 1) {
   return service({
     url: `/tasks?status=${status}`,
-    timeout: 5000,
+    timeout: 6000,
     method: 'get'
   })
 }

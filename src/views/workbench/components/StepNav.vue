@@ -7,6 +7,7 @@ import useScroll from '../../../hooks/useScroll';
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useTaskStore } from '../../../stores/useTaskStore';
 import { useStoryListStore } from '../../../stores/useStoryListStore';
+import { version } from '../../../const/index';
 const router = useRouter()
 const { t } = useI18n()
 defineProps<{
@@ -43,7 +44,7 @@ useScroll(({ top, direction }) => {
 }, 10)
 </script>
 <template>
-    <div :class="`step-nav flex justify-between px-4 h-18 lg:h-16 lg:h-auto lg:flex-row lg:flex-col lg:justify-start lg:px-0 ${fixedClass} ${scrollUpClass}`">
+    <div :class="`step-nav relative flex justify-between px-4 h-18 lg:h-auto lg:flex-row lg:flex-col lg:justify-start lg:px-0 ${fixedClass} ${scrollUpClass}`">
         <RouterLink to="/" class="flex items-center justify-center">
             <div class="brand-tit text-center font-size-4 color-white font-bold lg:mb-10 lg:pt-10">{{ t('workbench.brandTit') }}</div>
         </RouterLink>
@@ -130,6 +131,9 @@ useScroll(({ top, direction }) => {
                     <div class="arraw-right absolute top-0 hidden right-0 lg:block"></div>
                 </div>
             </div>
+
+            <div class="mt-10 hidden pb-2 text-center color-#eee lg:block">v{{ version }}</div>
+
         </div>
     </div>
 </template>
