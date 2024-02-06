@@ -293,12 +293,9 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
                   </template>
                 </Progress> -->
               </div>
-
-
             </div>
           </div>
           <div v-if="!createVideoLoading && !currentVideo.url && taskStore.tasks.gen_video" class="min-h-50 flex items-center justify-center lg:min-h-120">
-
             <div>
               <Progress type="circle" :percent="taskStore.tasks.gen_video.percent" :size="200">
                 <template #format>

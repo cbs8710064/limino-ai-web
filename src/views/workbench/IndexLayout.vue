@@ -24,13 +24,6 @@ onMounted(() => {
 
 })
 
-// watch(() => userStore.userInfo, (n) => {
-//   if (!n || !n.status) {
-//     router.replace({ name: 'home' })
-//   }
-// }, {
-//   immediate: true
-// })
 
 onUnmounted(() => {
   if (time) {
@@ -64,7 +57,7 @@ onBeforeRouteUpdate(() => {
       <RouterView />
     </div>
   </div>
-  <div class="mt-2 block bg-transparent pb-2 text-center color-#ccc">v{{ version }}</div>
+  <div class="mt-2 block bg-transparent pb-2 text-center color-#ccc lg:hidden">v{{ version }}</div>
 </template>
 <style scoped lang='scss'>
 .index-layout-right {

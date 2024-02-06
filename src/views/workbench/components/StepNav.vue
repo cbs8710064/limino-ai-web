@@ -24,24 +24,35 @@ const handleNext = (step: number, routeName: string) => {
     createStore.setStep(step)
     router.push({ name: routeName })
 }
+let innerWidth = 0
+const setInnerWidth = () => {
+    innerWidth = window.innerWidth
+}
 onMounted(() => {
+    innerWidth = window.innerWidth
     taskStory.handleLoopTaskOnEvent(2, 'gen_video')
+    window.addEventListener('resize', setInnerWidth)
 })
 
 onUnmounted(() => {
     taskStory.clearLoop()
+    window.removeEventListener('resize', setInnerWidth)
 })
 
 const fixedClass = ref('')
 const scrollUpClass = ref('')
 useScroll(({ top, direction }) => {
-    if (top > 4) {
-        fixedClass.value !== 'fixed-style' ? fixedClass.value = 'fixed-style' : ''
+    if (innerWidth < 1024) {
+        if (top > 4) {
+            fixedClass.value !== 'fixed-style' ? fixedClass.value = 'fixed-style' : ''
+        } else {
+            fixedClass.value !== '' ? fixedClass.value = '' : ''
+        }
+        scrollUpClass.value = direction === 'up' ? 'up-class' : ''
     } else {
         fixedClass.value !== '' ? fixedClass.value = '' : ''
     }
-    scrollUpClass.value = direction === 'up' ? 'up-class' : ''
-}, 10)
+}, 100)
 </script>
 <template>
     <div :class="`step-nav relative flex justify-between px-4 h-18 lg:h-auto lg:flex-row lg:flex-col lg:justify-start lg:px-0 ${fixedClass} ${scrollUpClass}`">

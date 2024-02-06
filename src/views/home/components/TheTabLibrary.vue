@@ -107,11 +107,11 @@ watch(() => showVideo.value, (n) => {
 </template>
 <style scoped lang='scss'>
 .videoEle::-webkit-media-controls {
-  /* display: none !important; */
+  display: none !important;
 }
 
 .videoEle::-webkit-media-controls-enclosure {
-  /* display: none !important; */
+  display: none !important;
 }
 
 .story-card {
@@ -181,6 +181,11 @@ watch(() => showVideo.value, (n) => {
 
 .the-tab-library {
   :deep() {
+    .the-modal-component .mask {
+      backdrop-filter: saturate(100%) blur(40px);
+      -webkit-backdrop-filter: saturate(100%) blur(40px);
+      background: rgba(0, 0, 0, .7);
+    }
 
     .the-modal-component .close-btn {
       top: -40px;
