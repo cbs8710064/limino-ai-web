@@ -105,70 +105,13 @@ export const useTaskStore = defineStore('taskStore', () => {
     })
   }
 
-  const timeCountDown: { [key in TaskType]: TypeSetInterval | null } = {
-    gen_cover: null,
-    gen_merged_video: null,
-    gen_role: null,
-    gen_shots: null,
-    gen_video: null,
-    init_story: null
-  }
-  const oldTaskData: { [key in TaskType]: TaskResponse | null } = {
-    gen_cover: null,
-    gen_merged_video: null,
-    gen_role: null,
-    gen_shots: null,
-    gen_video: null,
-    init_story: null
-  }
-  // const handleLoopCountDown = (type: TaskType) => {
-  //   // 只允许同时轮询一种类似的数据
-  //   if (timeCountDown[type]) {
-  //     clearInterval(timeCountDown[type] as TypeSetInterval)
-  //   }
-  //   // 没有缓存数据，直接返回
-  //   if (!oldTaskData[type]) {
-  //     return
-  //   }
-  //   // 有缓存数据，有状态1的数据就轮询递减left_time
-  //   timeCountDown[type] = setInterval(() => {
-  //     if (oldTaskData[type] && tasks.value[type]) {
-  //       // @ts-ignore
-  //       const { queue, total_time } = oldTaskData[type]
-  //       // @ts-ignore
-  //       tasks.value[type]?.left_time = total_time - 1
-  //     }
-  //   }, 1000)
-  // }
-  const sigleTime = 400
-  // 处理in line task的数据
-  // const handleInlineTask = (type: TaskType, list: Array<TaskResponse>) => {
-  //   const task = list.find((item) => item.status === 1)
-
-  //   // 存在运行中的数据并且没有缓存数据的时候，先缓存数据写入total_time
-  //   if (task && !oldTaskData[type]) {
-  //     const { queue } = task
-  //     // 队列为0的时候直接返回，清空原缓存
-  //     if (!queue) {
-  //       oldTaskData[type] = null
-  //       return
-  //     }
-  //     oldTaskData[type] = { ...task, left_time: sigleTime * queue }
-  //   } else if (oldTaskData[type]) {
-  //     // 没有in line任务时，清空原缓存
-  //     oldTaskData[type] = null
-  //   }
-  // }
   // use eventBus instead of fetch addListener event loopTaskEvent
   const handleLoopTaskOnEvent = async (taskStatus: number = 2, type: TaskType) => {
     eventBus.off('loopTaskEvent')
-    // handleLoopCountDown(type)
     return new Promise((resolve, reject) => {
       handleTask(taskStatus, type)
         .then(() => {
           eventBus.on('loopTaskEvent', async (list) => {
-            // handleInlineTask(type, list)
-
             try {
               await handleTaskData(type, taskStatus, list)
             } catch (err: any) {
