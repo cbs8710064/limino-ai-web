@@ -9,6 +9,7 @@ import UserScoreModal from '@/views/workbench/components/UserScoreModal.vue';
 import useScroll from '../hooks/useScroll';
 import { useUserStore } from '../stores/useUserStore';
 import router from '../router/index';
+import TheButton from '@/components/TheButton.vue';
 const userStore = useUserStore()
 defineProps<{
   hasBackground?: boolean
@@ -49,18 +50,30 @@ useScroll(({ top }) => {
     scrollFlag.value = false
   }
 })
+
+const handleAdd = () => {
+  if (!userStore.userInfo?.email) {
+    router.push({ name: 'login' })
+    return
+  }
+  // addModal.value = true
+  router.replace({
+    name: 'story'
+  })
+}
 </script>
 <template>
-  <div :class="`the-header fixed left-0 right-0 z-100 top-0 px-4 lg:px-10 h-12 lg:h-16 ${hasBackground ? 'tarnsparent' : ''} ${scrollFlag ? 'the-header-fixed' : ''}`">
+  <div :class="`the-header fixed left-0 right-0 z-101 top-0 px-4 lg:px-10 h-12 lg:h-14 ${hasBackground ? 'tarnsparent' : ''} ${scrollFlag ? 'the-header-fixed' : ''}`">
     <div class="h-100% flex justify-between">
       <div class="flex items-center justify-center">
-        <div class="brand-tit font-size-5 color-white font-bold lh-15 lg:font-size-8">{{ t('components.theHeader.companyTit') }}</div>
+        <div class="brand-tit font-size-5 color-white font-bold lh-13 lg:font-size-6">{{ t('components.theHeader.companyTit') }}</div>
       </div>
       <div class="flex items-center">
-        <div class="account-scores mr-2 flex cursor-pointer items-center justify-between rounded-full px-2 w-14 h-9 lg:w-16 lg:h-8">
+        <!-- <div class="account-scores mr-2 flex cursor-pointer items-center justify-between rounded-full px-2 w-14 h-9 lg:w-16 lg:h-8">
           <i class="i-mingcute-diamond-2-line font-size-4 color-#9f54ba lg:font-size-6"></i> <span class="font-size-4 font-bold lg:font-size-4.4">{{ userStore.userInfo?.user?.token || 0 }}</span>
-          <!-- <i class="i-ic-outline-add font-size-5.4 font-bold"></i> -->
-        </div>
+
+        </div> -->
+        <div class="mr-2 cursor-pointer border-width-1 border-white border-style-solid px-2 color-white lh-8 h-8 rounded-1 lg:border-#9f54ba lg:color-#9f54ba startBtn" @click="handleAdd">{{ t('home.startBtn') }}</div>
         <TheDropdown v-if="userStore.userInfo && userStore.userInfo.email" :options="logoutOpts" @change="changeLogout">
           <div class="userIcon flex cursor-pointer items-center justify-center rounded-full bg-white font-size-5 font-bold w-8 h-8">
             <i class="i-material-symbols-person font-size-6 color-#9f54ba"></i>
@@ -79,10 +92,14 @@ useScroll(({ top }) => {
   </div>
   <UserScoreModal v-model="userScoreModal" />
 </template>
-<style scoped>
+<style scoped lang="scss">
 .the-header {
   /* border-bottom: 1px solid #cbbdcc; */
   transition: ease .2s;
+}
+
+.startBtn:hover {
+  --at-apply: lg:color-#9f54ba;
 }
 
 .dark {
@@ -96,8 +113,12 @@ useScroll(({ top }) => {
 .the-header-fixed {
   backdrop-filter: saturate(40%) blur(10px);
   -webkit-backdrop-filter: saturate(40%) blur(10px);
-  background: rgba(82, 8, 83, 0.6);
+  background: rgba(100, 3, 101, 0.9);
   box-shadow: 1px 1px 4px rgba(52, 52, 51, 0.12);
+
+  .startBtn {
+    --at-apply: border-color-#fff color-white;
+  }
 }
 
 .the-header.tarnsparent .tit {

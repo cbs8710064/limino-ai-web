@@ -96,20 +96,28 @@ onUnmounted(() => {
                 <div class="story-img flex items-center justify-center h-24 lg:h-36.1">
                     <div class="flex justify-center">
                         <div v-if="taskStore.tasks.init_story && item.id === taskStore.tasks.init_story.storyId" class="w-100% overflow-hidden p-2 rounded-1">
-                            <Progress type="circle" :percent="taskStore.tasks.init_story.percent" :size="80">
-                                <template #format>
-                                    <div>
-                                        <div class="font-size-3.2 color-white lg:font-size-4" v-if="taskStore.tasks.init_story.status === 1">
-                                            <div class="mb-2 text-center font-size-4 font-bold">0%</div>
-                                            <div class="flex items-center justify-center">
-                                                <i class="i-fluent-people-queue-24-filled font-size-5"></i>
-                                                <span class="font-size-4 font-bold">{{ taskStore.tasks.init_story.queue }}</span>
-                                            </div>
-                                        </div>
-                                        <div v-else class="text-center color-white font-bold">{{ taskStore.tasks.init_story.percent }}%</div>
-                                    </div>
+
+                            <Popover placement="right">
+                                <template #content>
+                                    {{ t('common.waitNum', { number: taskStore.tasks.init_story.queue || 0 }) }}
                                 </template>
-                            </Progress>
+                                <Progress type="circle" :percent="taskStore.tasks.init_story.percent" :size="80">
+                                    <template #format>
+                                        <div>
+                                            <div class="font-size-3.2 color-white lg:font-size-4" v-if="taskStore.tasks.init_story.status === 1">
+                                                <div class="mb-2 text-center font-size-3 font-bold">0%</div>
+                                                <div class="flex items-center justify-center">
+                                                    <i class="i-fluent-people-queue-24-filled font-size-4"></i>
+                                                    <span class="font-size-4 font-bold">{{ taskStore.tasks.init_story.queue }}</span>
+                                                </div>
+                                            </div>
+                                            <div v-else class="text-center color-white font-bold">{{ taskStore.tasks.init_story.percent }}%</div>
+                                            <div v-if="taskStore.tasks?.init_story?.left_time" class="text-center font-size-3 mt-2 color-#1677ff font-bold">{{ t('common.leftTime', { time: taskStore.tasks.init_story.left_time }) }}</div>
+                                        </div>
+                                    </template>
+                                </Progress>
+                            </Popover>
+
                         </div>
                         <div v-else class="flex items-center justify-center p-2 w-25 h-25 lg:p-4 lg:w-35 lg:h-35">
                             <Image loading="lazy" v-if="item?.cover" :src="`${videoPath}/${item.cover}`" :preview="false" class="h-100% w-90% object-contain rounded-1" />

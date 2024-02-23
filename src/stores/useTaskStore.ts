@@ -5,6 +5,8 @@ const { getTasks } = useRequest()
 import { ids, setIds } from '@/stores/useStoryListStore'
 import { useEventBus } from '@/hooks/useBus'
 const { eventBus } = useEventBus()
+type TypeSetInterval = ReturnType<typeof setInterval>
+
 export type TaskType =
   | 'gen_video'
   | 'gen_shots'
@@ -19,11 +21,15 @@ export type TaskResponse = {
   status: number
   user: string
   percent?: number
+  queue?: number
+  left_time?: number
+  total_time?: number
+  storyId?: number
 }
 
 // type TimeType = ReturnType<typeof setInterval>
 export const useTaskStore = defineStore('taskStore', () => {
-  const tasks: Ref<{ [key in TaskType]: any }> = ref({
+  const tasks: Ref<{ [key in TaskType]: TaskResponse | null }> = ref({
     gen_video: null,
     gen_shots: null,
     gen_role: null,
@@ -43,7 +49,7 @@ export const useTaskStore = defineStore('taskStore', () => {
         return
       case 'init_story':
         // eslint-disable-next-line no-case-declarations
-        let storyId: number | null = null
+        let storyId: number | undefined
         if (val) {
           const { args }: any = val
           args && args.length ? (storyId = args[0]) : ''
@@ -75,38 +81,11 @@ export const useTaskStore = defineStore('taskStore', () => {
     })
   }
 
-  // const loopTasks = async (taskStatus: number = 2, type: TaskType, loopDelay: number = 7000) => {
-  //   if (tasksTime[type]) {
-  //     clearLoop(type)
-  //   }
-  //   if (loopDelay < 5000) {
-  //     throw new Error('The value of LoopDelay must be greater than 5000')
-  //   }
-  //   try {
-  //     await handleTask(taskStatus, type)
-  //     tasksTime[type] = setInterval(async () => {
-  //       try {
-  //         await handleTask(taskStatus, type)
-  //       } catch (e) {
-  //         clearInterval(tasksTime[type] as TimeType)
-  //         if (type === 'gen_cover' || type === 'gen_role' || type === 'gen_shots') {
-  //           if (ids) {
-  //             setIds(ids)
-  //           }
-  //           location.reload()
-  //         }
-  //       }
-  //     }, loopDelay)
-  //   } catch (err: any) {
-  //     clearInterval(tasksTime[type] as TimeType)
-  //   }
-  // }
-
   const clearLoop = () => {
     eventBus.off('loopTaskEvent')
   }
   const hasVideoTask = computed(() => tasks.value.gen_video)
-
+  // 处理 传入type的task
   const handleTaskData = (type: TaskType, status: number, list: Array<TaskResponse>) => {
     // const list = storylistStore.tasksList
     return new Promise((resolve, reject) => {
@@ -125,13 +104,71 @@ export const useTaskStore = defineStore('taskStore', () => {
       }
     })
   }
+
+  const timeCountDown: { [key in TaskType]: TypeSetInterval | null } = {
+    gen_cover: null,
+    gen_merged_video: null,
+    gen_role: null,
+    gen_shots: null,
+    gen_video: null,
+    init_story: null
+  }
+  const oldTaskData: { [key in TaskType]: TaskResponse | null } = {
+    gen_cover: null,
+    gen_merged_video: null,
+    gen_role: null,
+    gen_shots: null,
+    gen_video: null,
+    init_story: null
+  }
+  // const handleLoopCountDown = (type: TaskType) => {
+  //   // 只允许同时轮询一种类似的数据
+  //   if (timeCountDown[type]) {
+  //     clearInterval(timeCountDown[type] as TypeSetInterval)
+  //   }
+  //   // 没有缓存数据，直接返回
+  //   if (!oldTaskData[type]) {
+  //     return
+  //   }
+  //   // 有缓存数据，有状态1的数据就轮询递减left_time
+  //   timeCountDown[type] = setInterval(() => {
+  //     if (oldTaskData[type] && tasks.value[type]) {
+  //       // @ts-ignore
+  //       const { queue, total_time } = oldTaskData[type]
+  //       // @ts-ignore
+  //       tasks.value[type]?.left_time = total_time - 1
+  //     }
+  //   }, 1000)
+  // }
+  const sigleTime = 400
+  // 处理in line task的数据
+  // const handleInlineTask = (type: TaskType, list: Array<TaskResponse>) => {
+  //   const task = list.find((item) => item.status === 1)
+
+  //   // 存在运行中的数据并且没有缓存数据的时候，先缓存数据写入total_time
+  //   if (task && !oldTaskData[type]) {
+  //     const { queue } = task
+  //     // 队列为0的时候直接返回，清空原缓存
+  //     if (!queue) {
+  //       oldTaskData[type] = null
+  //       return
+  //     }
+  //     oldTaskData[type] = { ...task, left_time: sigleTime * queue }
+  //   } else if (oldTaskData[type]) {
+  //     // 没有in line任务时，清空原缓存
+  //     oldTaskData[type] = null
+  //   }
+  // }
   // use eventBus instead of fetch addListener event loopTaskEvent
   const handleLoopTaskOnEvent = async (taskStatus: number = 2, type: TaskType) => {
     eventBus.off('loopTaskEvent')
+    // handleLoopCountDown(type)
     return new Promise((resolve, reject) => {
       handleTask(taskStatus, type)
         .then(() => {
           eventBus.on('loopTaskEvent', async (list) => {
+            // handleInlineTask(type, list)
+
             try {
               await handleTaskData(type, taskStatus, list)
             } catch (err: any) {

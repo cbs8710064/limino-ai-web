@@ -6,7 +6,7 @@ import TheButton from '@/components/TheButton.vue';
 import { useI18n } from 'vue-i18n';
 import StoryList from '@/views/workbench/components/StoryList.vue'
 import { useEventBus } from '../../hooks/useBus';
-import { Image, Progress } from 'ant-design-vue'
+import { Image, Progress, Popover } from 'ant-design-vue'
 import router from '../../router/index';
 import { useStoryListStore, type StoryItem } from '../../stores/useStoryListStore';
 import { storeToRefs } from 'pinia';
@@ -133,20 +133,25 @@ watch(() => storyListStore.selectStoryRole, n => {
                         <img :src="`${videoPath}/${selectStoryRole?.image}`" class="w-100% object-contain h-140 rounded-1" alt="">
                     </div>
                     <div v-else class="max-h-140 flex items-center justify-center">
-                        <Progress v-if="taskStore.tasks.gen_role" type="circle" :percent="taskStore.tasks.gen_role?.percent" :size="200">
-                            <template #format>
-                                <div>
-                                    <div class="font-size-4 color-#9f54ba" v-if="taskStore.tasks.gen_role.status === 1">
-                                        <div class="mb-2 text-center font-size-7 font-bold">0%</div>
-                                        <div class="flex items-center justify-center">
-                                            <i class="i-fluent-people-queue-24-filled font-size-7"></i>
-                                            <span class="font-size-5 font-bold">{{ taskStore.tasks.gen_role.queue }}</span>
+                        <Popover placement="right" v-if="taskStore.tasks.gen_role">
+                            <template #content> {{ t('common.waitNum', { number: taskStore.tasks.gen_role.queue || 0 }) }}</template>
+                            <Progress type="circle" :percent="taskStore.tasks.gen_role?.percent" :size="200">
+                                <template #format>
+                                    <div>
+                                        <div class="font-size-4 color-#9f54ba" v-if="taskStore.tasks.gen_role.status === 1">
+                                            <div class="mb-2 text-center font-size-7 font-bold">0%</div>
+                                            <div class="flex items-center justify-center">
+                                                <i class="i-fluent-people-queue-24-filled font-size-7"></i>
+                                                <span class="font-size-5 font-bold">{{ taskStore.tasks.gen_role.queue }}</span>
+                                            </div>
                                         </div>
+                                        <div v-else class="text-center font-size-7 font-bold">{{ taskStore.tasks.gen_role.percent }}%</div>
+                                        <div v-if="taskStore.tasks?.gen_role?.left_time" class="text-center font-size-4 mt-2 color-#1677ff font-bold">{{ t('common.leftTime', { time: taskStore.tasks.gen_role.left_time }) }}</div>
                                     </div>
-                                    <div v-else class="text-center font-size-7 font-bold">{{ taskStore.tasks.gen_role.percent }}%</div>
-                                </div>
-                            </template>
-                        </Progress>
+                                </template>
+                            </Progress>
+                        </Popover>
+
                         <div v-else class="flex items-center justify-center px-15 h-50">
                             <TheNoData />
                         </div>

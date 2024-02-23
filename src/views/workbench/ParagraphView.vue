@@ -8,7 +8,7 @@ import TheButton from '@/components/TheButton.vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import type { StoryItem } from '../../stores/useStoryListStore';
-import { useStoryListStore } from '../../stores/useStoryListStore';
+import { useStoryListStore, ids } from '../../stores/useStoryListStore';
 import { useRequest } from '../../api/useRequest';
 import { videoPath } from '../../const/index';
 import { Image, Progress, Popover } from 'ant-design-vue'
@@ -27,9 +27,12 @@ const currentVideo = ref({
   url: '',
   status: '',
   main_video: '',
-  process: null
+  process: null,
+  chatIdx: 0
 })
-
+const generateIdx = computed(() => {
+  return storyListStore.selectedStory?.description?.chat_process?.findIndex(c => c.process === 1 || c.process === 2)
+})
 onMounted(async () => {
   createStore.setStep(4)
   storyListStore.getStoryList()
@@ -51,7 +54,7 @@ onUnmounted(() => {
 const handleChangeStory = (e: StoryItem) => {
 
 
-  currentVideo.value = { url: '', status: '', main_video: '', process: null }
+  currentVideo.value = { url: '', status: '', main_video: '', process: null, chatIdx: 0 }
   shots.value = []
   storyListStore.setChatSelected(0)
 
@@ -65,7 +68,8 @@ const handleChangeStory = (e: StoryItem) => {
           url,
           status,
           main_video,
-          process: null
+          process: null,
+          chatIdx: 0
         }
       })
     }
@@ -273,12 +277,39 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
             </div>
             <div v-if="currentVideo.url && taskStore.tasks.gen_video">
               <div class="min-h-50 flex items-center justify-center lg:min-h-120">
-                <div class="relative">
+                <div class="relative" v-if="currentVideo.chatIdx !== generateIdx">
                   <video class="z-140 w-100% bg-#ccc object-cover rounded-1" controls playsinline>
                     <source :src="`${videoPath}/${currentVideo.main_video}`" type="video/mp4">
                   </video>
                 </div>
-                <!-- <Progress v-else type="circle" :percent="taskStore.tasks?.gen_video?.percent" :size="200">
+                <Popover v-else placement="right">
+                  <template #content>{{ t('common.waitNum', { number: taskStore.tasks.gen_video.queue || 0 }) }}</template>
+                  <Progress type="circle" :percent="taskStore.tasks?.gen_video?.percent" :size="200">
+                    <template #format>
+                      <div>
+                        <div class="font-size-4 color-#9f54ba" v-if="taskStore.tasks.gen_video.status === 1">
+                          <div class="mb-2 text-center font-size-7 font-bold">0%</div>
+                          <div class="flex items-center justify-center">
+                            <i class="i-fluent-people-queue-24-filled font-size-7"></i>
+                            <span class="font-size-5 font-bold">{{ taskStore.tasks.gen_video.queue }}</span>
+                          </div>
+                        </div>
+                        <div v-else class="text-center font-size-7 font-bold">{{ taskStore.tasks.gen_video.percent }}%</div>
+                        <div v-if="taskStore.tasks?.gen_video?.left_time" class="text-center font-size-4 mt-2 color-#1677ff font-bold">{{ t('common.leftTime', { time: taskStore.tasks.gen_video.left_time }) }}</div>
+
+                      </div>
+                    </template>
+                  </Progress>
+                </Popover>
+
+              </div>
+            </div>
+          </div>
+          <div v-if="!createVideoLoading && !currentVideo.url && taskStore.tasks.gen_video" class="min-h-50 flex items-center justify-center lg:min-h-120">
+            <div>
+              <Popover placement="right">
+                <template #content>{{ t('common.waitNum', { number: taskStore.tasks.gen_video.queue || 0 }) }}</template>
+                <Progress type="circle" :percent="taskStore.tasks.gen_video.percent" :size="200">
                   <template #format>
                     <div>
                       <div class="font-size-4 color-#9f54ba" v-if="taskStore.tasks.gen_video.status === 1">
@@ -289,29 +320,15 @@ const currentChatContent = computed(() => storyListStore.selectedChat && storyLi
                         </div>
                       </div>
                       <div v-else class="text-center font-size-7 font-bold">{{ taskStore.tasks.gen_video.percent }}%</div>
+                      <div v-if="taskStore.tasks?.gen_video?.left_time" class="text-center font-size-4 mt-2 color-#1677ff font-bold">{{ t('common.leftTime', { time: taskStore.tasks.gen_video.left_time }) }}</div>
+
                     </div>
                   </template>
-                </Progress> -->
-              </div>
+                </Progress>
+              </Popover>
+
             </div>
-          </div>
-          <div v-if="!createVideoLoading && !currentVideo.url && taskStore.tasks.gen_video" class="min-h-50 flex items-center justify-center lg:min-h-120">
-            <div>
-              <Progress type="circle" :percent="taskStore.tasks.gen_video.percent" :size="200">
-                <template #format>
-                  <div>
-                    <div class="font-size-4 color-#9f54ba" v-if="taskStore.tasks.gen_video.status === 1">
-                      <div class="mb-2 text-center font-size-7 font-bold">0%</div>
-                      <div class="flex items-center justify-center">
-                        <i class="i-fluent-people-queue-24-filled font-size-7"></i>
-                        <span class="font-size-5 font-bold">{{ taskStore.tasks.gen_video.queue }}</span>
-                      </div>
-                    </div>
-                    <div v-else class="text-center font-size-7 font-bold">{{ taskStore.tasks.gen_video.percent }}%</div>
-                  </div>
-                </template>
-              </Progress>
-            </div>
+            <!-- {{ JSON.stringify(taskStore.tasks?.gen_video) }} -->
           </div>
           <div v-if="!createVideoLoading && !currentVideo.url && !taskStore.tasks.gen_video" class="min-h-50 flex items-center justify-center lg:min-h-120">
             <div>

@@ -82,18 +82,18 @@ textarea::placeholder {
     overflow-x: scroll;
 
     &::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
       // background-color: #F5F5F5;
     }
 
     &::-webkit-scrollbar-track {
-      border-radius: 3px;
+      border-radius: 2.5px;
       // background-color: #e9e9e9;
     }
 
     &::-webkit-scrollbar-thumb {
-      border-radius: 3px;
+      border-radius: 2.5px;
       background-color: #cdcbcb;
     }
 
@@ -104,18 +104,18 @@ textarea::placeholder {
     overflow-y: scroll;
 
     &::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
       // background-color: #F5F5F5;
     }
 
     &::-webkit-scrollbar-track {
-      border-radius: 3px;
+      border-radius: 2.5px;
       // background-color: #e9e9e9;
     }
 
     &::-webkit-scrollbar-thumb {
-      border-radius: 3px;
+      border-radius: 2.5px;
       background-color: #cdcbcb;
     }
 

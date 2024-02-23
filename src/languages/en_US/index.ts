@@ -6,7 +6,9 @@ export default {
     hasQueueNum: 'In front of there are {number}',
     submit: 'Submit',
     useScriptCreate: 'Use the script to generate a video',
-    useAllScriptCreate: 'Directly generate all videos for all scripts under that story'
+    useAllScriptCreate: 'Directly generate all videos for all scripts under that story',
+    leftTime: 'Waiting {time} s',
+    waitNum: 'You still have to wait for {number} users'
   },
 
   home: {
@@ -15,7 +17,7 @@ export default {
       'Innovating the process of generating anime videos from text with AI. we aggregate the whole workflow to provide end-to-end AI anime generation services for both B and C sides. This allows anyone to become an anime producer.',
     startBtn: 'Start Creating',
     selectStyle: 'Select the style you prefer',
-    pieceTit: 'Piece Title',
+    pieceTit: 'Title or Story Title',
     creator: 'Creator',
     authorNamePlaceholder: 'Author name',
     chooseStyleTit: 'Choose A Drawing Style',

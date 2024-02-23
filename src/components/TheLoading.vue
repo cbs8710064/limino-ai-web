@@ -1,7 +1,8 @@
 <script setup lang='ts'>
 import { defineProps } from 'vue'
 defineProps<{
-    loading: boolean
+    loading: boolean,
+    iconClass?: string
 }>()
 </script>
 <template>
@@ -10,7 +11,7 @@ defineProps<{
 
         <div v-else class="the-loading">
             <div class="load-icon h-100%">
-                <i class="i-svg-spinners-ring-resize font-size-10 color-#1677ff"></i>
+                <i :class="`i-svg-spinners-ring-resize font-size-10 color-#1677ff ${iconClass ? iconClass : ''}`"></i>
             </div>
         </div>
     </div>

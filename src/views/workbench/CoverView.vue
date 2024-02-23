@@ -69,20 +69,27 @@ const handleUpdateStoryCover = async () => {
           </div>
           <div class="max-h-120 w-100% flex items-center justify-center bg-white py-4 lg:min-h-140" v-else>
             <TheNoData v-if="!taskStore.tasks.gen_cover" />
-            <Progress v-else type="circle" :percent="taskStore.tasks.gen_cover?.percent" :size="200">
-              <template #format>
-                <div>
-                  <div class="font-size-4 color-#9f54ba" v-if="taskStore.tasks.gen_cover.status === 1">
-                    <div class="mb-2 text-center font-size-7 font-bold">0%</div>
-                    <div class="flex items-center justify-center">
-                      <i class="i-fluent-people-queue-24-filled font-size-7"></i>
-                      <span class="font-size-5 font-bold">{{ taskStore.tasks.gen_cover.queue }}</span>
-                    </div>
-                  </div>
-                  <div v-else class="text-center font-size-7 font-bold">{{ taskStore.tasks.gen_cover.percent }}%</div>
-                </div>
+            <Popover v-else placement="right">
+              <template #content>
+                {{ t('common.waitNum', { number: taskStore.tasks.gen_cover.queue || 0 }) }}
               </template>
-            </Progress>
+              <Progress type="circle" :percent="taskStore.tasks.gen_cover?.percent" :size="200">
+                <template #format>
+                  <div>
+                    <div class="font-size-4 color-#9f54ba" v-if="taskStore.tasks.gen_cover.status === 1">
+                      <div class="mb-2 text-center font-size-7 font-bold">0%</div>
+                      <div class="flex items-center justify-center">
+                        <i class="i-fluent-people-queue-24-filled font-size-7"></i>
+                        <span class="font-size-5 font-bold">{{ taskStore.tasks.gen_cover.queue }}</span>
+                      </div>
+                    </div>
+                    <div v-else class="text-center font-size-7 font-bold">{{ taskStore.tasks.gen_cover.percent }}%</div>
+                    <div v-if="taskStore.tasks?.gen_cover?.left_time" class="text-center font-size-4 mt-2 color-#1677ff font-bold">{{ t('common.leftTime', { time: taskStore.tasks.gen_cover.left_time }) }}</div>
+                  </div>
+                </template>
+              </Progress>
+            </Popover>
+
           </div>
 
         </div>

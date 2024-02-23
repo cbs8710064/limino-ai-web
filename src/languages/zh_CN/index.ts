@@ -6,7 +6,9 @@ export default {
     hasQueueNum: '还有{number}位',
     submit: '提交',
     useScriptCreate: '使用该剧本生成视频',
-    useAllScriptCreate: '直接生成该故事下所有剧本的所有视频'
+    useAllScriptCreate: '直接生成该故事下所有剧本的所有视频',
+    leftTime: '还剩{time}秒',
+    waitNum: '您仍然需要等待 {number} 用户'
   },
 
   home: {
@@ -15,7 +17,7 @@ export default {
       '创新使用 AI 从文本生成动漫视频的过程。我们聚合整个工作流程，为B方和C方提供端到端的AI动漫生成服务。这使任何人都可以成为动漫制作人。',
     startBtn: '开始创作',
     selectStyle: '选择您喜欢的风格',
-    pieceTit: '作品标题',
+    pieceTit: '标题或故事标题',
     creator: '创作者',
     authorNamePlaceholder: '作者姓名',
     chooseStyleTit: '选择绘图样式',

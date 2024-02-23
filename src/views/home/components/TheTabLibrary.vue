@@ -26,7 +26,7 @@ type ListItem = {
 }
 
 const videoRef: Ref<HTMLVideoElement | null> = ref(null)
-const handleModif = (e: ListItem) => {
+const handlePlayClick = (e: ListItem) => {
   showVideo.value = true
   currentVideo.value = e
 }
@@ -70,26 +70,38 @@ watch(() => showVideo.value, (n) => {
 })
 </script>
 <template>
-  <div class="scrollbar-small-y the-tab-library scrollbar-none max-h-auto p-2 lg:p-4">
+  <div class="scrollbar-small-y the-tab-library scrollbar-none">
     <TheLoading :loading="loading" class="min-h-60">
-      <div v-if="list.length" class="flex flex-wrap">
-        <div v-for="item in list" :key="item.id" class="story-card" @click="handleModif(item)">
-          <div class="h-100%">
+      <div v-if="list.length" class="list-box flex flex-wrap">
+        <div v-for="item in list" :key="item.id" class="story-card">
+          <div class="h-100% w-100%">
             <div class="h-100% flex items-center justify-center">
               <img v-if="item?.cover" class="h-100% w-100% object-cover" :src="`${videoPath}/${item.cover}`" alt="">
               <i v-else class="i-ic-round-photo-size-select-actual font-size-10 color-#ccc"></i>
             </div>
           </div>
-          <div class="play-icon absolute left-50% top-50% z-10 ml--10 mt--10 color-white w-10 h-10 lg:opacity-0">
+          <div class="play-icon absolute left-50% top-50% z-10 ml--10 mt--10 color-white w-10 h-10 lg:opacity-0" @click="handlePlayClick(item)">
             <i class="i-material-symbols-play-circle font-size-20"></i>
           </div>
-          <div class="name absolute bottom-0 left-0 rounded-t-1 text-center font-size-4 color-white font-bold lh-10 right-0 h-10">{{ item.name }}</div>
+          <div class="info-box">
+            <div class="name">{{ item.name }}</div>
+            <div class="actions">
+              <div>
+                <i class="i-bxs-like"></i><span class="total">99</span>
+                <!-- <i class="i-bx-bxs-dislike"></i> -->
+                <i class="i-twemoji-red-heart ml-2"></i><span class="total">88</span>
+              </div>
+              <div>
+                <i class="i-ph-circle-wavy-warning-fill"></i>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <TheNoData v-else :message="t('home.noContent')" />
     </TheLoading>
     <TheModal v-model="showVideo" :has-mask="true" :has-close="true" keyboard @cancel="handleCloseModal" click-close lock-scroll>
-      <TheLoading :loading="videoLoading" class="min-h-60 lg:min-h-120" v-show="videoLoading"></TheLoading>
+      <TheLoading :loading="videoLoading" class="min-h-60 lg:min-h-120" icon-class="lg:font-size-14" v-show="videoLoading"></TheLoading>
       <div class="relative mb--2.5 px-2 lg:mb--4 lg:px-4" v-show="!videoLoading">
         <video class="videoEle w-100%" :controls="false" playsinline autoplay @canplay="handleCanplay" @ended="handleEnded" ref="videoRef">
           <source :src="`${videoPath}/${currentVideo.video}`" type="video/mp4">
@@ -114,8 +126,12 @@ watch(() => showVideo.value, (n) => {
   display: none !important;
 }
 
+.list-box {
+  /* --at-apply: max-h-70vh; */
+}
+
 .story-card {
-  --at-apply: w-47% lg:w-23% h-70 lg:h-58 rounded-1 flex justify-center items-center mx-0 lg:mx-1% mb-2 lg:mb-5 cursor-pointer relative overflow-hidden;
+  --at-apply: w-100% h-70 sm:w-46.5% lg:w-31% xl:w-23% xl:h-64 mx-0 mb-2 sm:mx-1.7% sm:mb-6 xl:mb-5 xl:mx-1% lg:mx-1.16% lg:mb-5 rounded-1 flex justify-center items-center cursor-pointer relative overflow-hidden;
   border: 1px solid #ccc;
   width: 100%;
   background-size: 200%;
@@ -128,9 +144,10 @@ watch(() => showVideo.value, (n) => {
     right: 0;
     top: 0;
     bottom: 0;
-    backdrop-filter: saturate(20%) blur(10px);
-    -webkit-backdrop-filter: saturate(20%) blur(10px);
-    background: rgba(27, 27, 27, .3);
+    /* transform: scale(2); */
+    /* backdrop-filter: saturate(20%) blur(5px);
+    -webkit-backdrop-filter: saturate(20%) blur(5px);
+    background: rgba(27, 27, 27, .2); */
     opacity: 0;
     transition: opacity .6s;
     z-index: 1;
@@ -141,16 +158,39 @@ watch(() => showVideo.value, (n) => {
   }
 
   .name {
-    background: rgba($color: #000000, $alpha: .7);
+    /* background: rgba($color: #000000, $alpha: .7); */
     transition: ease .3s;
-    --at-apply: overflow-hidden text-ellipsis whitespace-nowrap;
+    --at-apply: overflow-hidden text-ellipsis whitespace-nowrap rounded-t-1 text-left font-size-3 color-white lh-5 h-5;
+    text-shadow: 1px 1px 2px rgb(53, 52, 52);
+  }
+
+  .actions {
+    --at-apply: flex justify-between font-size-5 color-#eee lh-6;
+
+    .total {
+      --at-apply: font-size-3 ml-1;
+    }
+  }
+
+  .info-box {
+    --at-apply: absolute left-0 right-0 bottom-0 px-4 font-size-5 color-#eee z-100 py-4 lg:py-2;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .8) 100%);
+
+    i {
+      --at-apply: font-size-5 lg:font-size-3;
+    }
+
+  }
+
+  img {
+    transition: ease .3s;
   }
 
   &:hover {
     border-color: #9f54ba;
-    box-shadow: 0 6px 12px 0 rgba(38, 38, 38, 0.08),
-      0 4px 16px 0px rgba(41, 40, 40, 0.08),
-      0 7px 15px 0 rgba(35, 35, 35, 0.08);
+    box-shadow: 0 6px 12px 0 rgba(38, 38, 38, 0.01),
+      0 4px 16px 0px rgba(41, 40, 40, 0.01),
+      0 7px 15px 0 rgba(35, 35, 35, 0.01);
 
 
     &::before {
@@ -161,9 +201,13 @@ watch(() => showVideo.value, (n) => {
       opacity: 1;
     }
 
-    .name {
-      transform: translateY(100%);
+    img {
+      transform: scale(1.1);
     }
+
+    /* .name {
+      transform: translateY(100%);
+    } */
 
   }
 }
@@ -180,11 +224,13 @@ watch(() => showVideo.value, (n) => {
 }
 
 .the-tab-library {
+  --at-apply: max-h-auto p-2 lg:p-4;
+
   :deep() {
     .the-modal-component .mask {
-      backdrop-filter: saturate(100%) blur(40px);
-      -webkit-backdrop-filter: saturate(100%) blur(40px);
-      background: rgba(0, 0, 0, .7);
+      backdrop-filter: saturate(170%) blur(40px);
+      -webkit-backdrop-filter: saturate(170%) blur(40px);
+      background: rgba(0, 0, 0, .75);
     }
 
     .the-modal-component .close-btn {

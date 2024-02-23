@@ -1,6 +1,6 @@
 // @unocss-include
 // Project version number. +1 per release
-export const version = '1.0.1'
+export const version = '1.0.8'
 
 export const uuidKey = 'user-id'
 export const videoPath = import.meta.env.VITE_APP_APIPATH

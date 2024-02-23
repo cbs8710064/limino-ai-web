@@ -7,23 +7,10 @@ import TheModal from '@/components/TheModal.vue';
 import TheTabs from '@/components/TheTabs.vue';
 import TheTabLibrary from '@/views/home/components/TheTabLibrary.vue'
 import TheFooter from '@/components/TheFooter.vue';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '../../stores/useUserStore';
 import { version } from '../../const/index';
-const userStore = useUserStore()
+
 const { t } = useI18n()
 const addModal = ref(false)
-const router = useRouter()
-const handleAdd = () => {
-  if (!userStore.userInfo?.email) {
-    router.push({ name: 'login' })
-    return
-  }
-  // addModal.value = true
-  router.replace({
-    name: 'story'
-  })
-}
 
 
 </script>
@@ -31,20 +18,15 @@ const handleAdd = () => {
 <template>
   <TheHeader hasBackground />
 
-  <div class="home-view pt-30">
+  <div class="home-view pt-14">
     <div class="w-100% px-4 lg:px-10">
       <div class="max-w-100% flex justify-center">
         <div class="w-100%">
-          <div class="big-desc max-w-100% text-center font-size-5 font-bold lh-6 lg:font-size-8 lg:lh-14">{{ t('home.title') }}</div>
-          <!-- <div class="small-desc mt-14 max-w-100% text-center font-size-3.5 lh-5 lg:mt-8 lg:max-w-100 lg:text-left lg:font-size-4">{{ t('home.smallTitle') }}
-          </div> -->
+          <div class="big-desc mt-4 max-w-100% text-center font-size-4 font-bold lh-6 lg:mt-10 lg:font-size-6 lg:lh-10">{{ t('home.title') }}</div>
         </div>
         <div></div>
       </div>
-      <div class="mt-10 lg:mt-30">
-        <div class="mt-10 flex items-center justify-center lg:mt--10">
-          <div @click="handleAdd" class="create-btn">{{ t('home.startBtn') }}</div>
-        </div>
+      <div>
         <div class="m-auto mt-10 max-w-100% min-h-70 bg-white rounded-3 lg:max-w-80vw lg:rounded-5">
           <div class="home-tabs">
             <TheTabs>
@@ -53,11 +35,10 @@ const handleAdd = () => {
               </div>
             </TheTabs>
           </div>
-
         </div>
       </div>
       <!-- <TheFooter /> -->
-      <div class="mt-10 block bg-transparent pb-2 text-center color-#ccc">v{{ version }}</div>
+      <!-- <div class="mt-5 block bg-transparent pb-2 text-center color-#ccc">v{{ version }}</div> -->
 
     </div>
 
@@ -86,7 +67,7 @@ const handleAdd = () => {
     }
 
     .the-tab-text {
-      line-height: 50px;
+      --at-apply: lh-9 font-size-4;
     }
   }
 }
@@ -94,6 +75,7 @@ const handleAdd = () => {
 .home-view {
   background: linear-gradient(120deg, #9f54ba 50%, rgb(245, 244, 235) 50%, rgb(245, 244, 235) 100%);
   min-height: 100vh;
+
 
 }
 

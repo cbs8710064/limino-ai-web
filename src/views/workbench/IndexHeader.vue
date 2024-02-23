@@ -19,7 +19,7 @@ const handleScoreAdd = () => {
 
         <!-- <div class="row-line mr-4" v-if="createStore.step === 5 && storyListStore.selectStoryHasVideo"></div> -->
         <div class="account-scores">
-          <i class="i-mingcute-diamond-2-line font-size-4 color-#9f54ba lg:font-size-6"></i>
+          <i class="i-mingcute-diamond-2-line font-size-4 color-#9f54ba lg:font-size-5"></i>
           <span class="font-size-4 font-bold lg:font-size-4.4">{{ userStore.userInfo?.user?.token || 0 }}</span>
           <!-- <i class="i-ic-outline-add font-size-5.4 font-bold"></i> -->
         </div>
@@ -33,7 +33,7 @@ const handleScoreAdd = () => {
 .account-scores {
   background: #000;
   color: #fff;
-  --at-apply: flex cursor-pointer items-center justify-between rounded-full px-2 lg:px-4 w-14 h-8 lg:w-20 lg:h-9;
+  --at-apply: flex cursor-pointer items-center justify-between rounded-full px-2 lg:px-4 w-14 h-8 lg:w-18 lg:h-9;
 }
 
 .con-header {
